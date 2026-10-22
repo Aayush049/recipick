@@ -3,7 +3,6 @@
 package com.aayush.recipick.data.remote
 
 import com.aayush.recipick.data.remote.dto.AddRecipeRequest
-import com.aayush.recipick.data.remote.dto.AddRecipeResponse
 import com.aayush.recipick.data.remote.dto.Recipe
 import com.aayush.recipick.data.remote.dto.RecipeResponse
 import io.ktor.client.HttpClient
