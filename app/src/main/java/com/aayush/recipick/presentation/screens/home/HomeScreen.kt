@@ -1,16 +1,19 @@
 package com.aayush.recipick.presentation.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuOpen
 import androidx.compose.material3.Button
@@ -27,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aayush.recipick.presentation.components.LoadingIndicator
 import com.aayush.recipick.presentation.viewmodels.HomeViewModel
 import com.aayush.recipick.ui.theme.Orange
 
@@ -54,15 +58,17 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ){
-            when{
-                viewModel.isLoading -> LoadingIndicator()
+        ) {
+            when {
+                viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
 
                 viewModel.errorMessage != null -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Orange.copy(0.03f)),
                         contentAlignment = Alignment.Center
-                    ){
+                    ) {
                         Column() {
                             Text(
                                 text = viewModel.errorMessage ?: "",
@@ -84,7 +90,7 @@ fun HomeScreen(
                                     contentColor = Color.White,
                                     containerColor = Orange
                                 )
-                            ){
+                            ) {
                                 Text(
                                     text = "Retry",
                                     fontSize = 16.sp,
@@ -106,7 +112,7 @@ fun HomeScreen(
                             HomeHeader()
                         }
 
-                        if (viewModel.categories.size > 1){
+                        if (viewModel.categories.size > 1) {
                             item(span = { GridItemSpan(maxLineSpan) }) {
                                 CategorySection(
                                     categories = viewModel.categories,
@@ -122,10 +128,35 @@ fun HomeScreen(
                                 icon = Icons.Default.MenuOpen
                             )
                         }
+
+                        if (viewModel.recipes.isEmpty()) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 48.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "No Recipes Found",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Orange
+                                    )
+                                }
+                            }
+                        } else {
+                            items(viewModel.recipes, key = { it.id }) { recipe ->
+                                RecipeCard(
+                                    recipe = recipe,
+                                    onClickk = { onRecipeClick(recipe.id) }
+                                )
+                            }
+                        }
                     }
                 }
             }
-        }
 
+        }
     }
 }

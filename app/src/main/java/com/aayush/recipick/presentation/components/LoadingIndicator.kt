@@ -1,4 +1,4 @@
-package com.aayush.recipick.presentation.screens.home
+package com.aayush.recipick.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -6,16 +6,18 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import com.aayush.recipick.ui.theme.Orange
 
 @Composable
-fun LoadingIndicator() {
+fun LoadingIndicator(strokeWidth: Dp) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = Orange
+            color = Orange,
+            strokeWidth = strokeWidth
         )
     }
 }
