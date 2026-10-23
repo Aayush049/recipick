@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local-only dev files — never push
+CLAUDE.md
+.claude/
+docs/v2-dev/
