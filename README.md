@@ -1,10 +1,11 @@
 # ReciPick
 
-[![Version](https://img.shields.io/badge/Version-1.0-orange.svg)](https://github.com/Aayush049/recipick)
+[![Version](https://img.shields.io/badge/Version-2.0-orange.svg)](https://github.com/Aayush049/recipick)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-brightgreen.svg)](https://developer.android.com/topic/architecture)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg)](https://kotlinlang.org/)
 [![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%7C%20Material%203-blue.svg)](https://developer.android.com/jetpack/compose)
+[![Room](https://img.shields.io/badge/Database-Room%202.7-blueviolet.svg)](https://developer.android.com/training/data-storage/room)
 [![Ktor](https://img.shields.io/badge/Network-Ktor%203.6.0-black.svg)](https://ktor.io/)
 
 A modern recipe discovery and meal preparation application built with Jetpack Compose, Kotlin, and Clean Architecture.
@@ -13,70 +14,68 @@ A modern recipe discovery and meal preparation application built with Jetpack Co
 
 ## Overview
 
-ReciPick is a native Android application designed to help users discover, browse, and prepare a wide range of culinary recipes. Built adhering strictly to the **Clean Architecture** pattern, the codebase enforces clear boundaries, separation of concerns, and maintainable data flow across distinct layers.
+ReciPick is a native Android application designed to help users discover, browse, author, and prepare a wide range of culinary recipes. Built adhering strictly to the **Clean Architecture** pattern, the codebase enforces clear boundaries, separation of concerns, and maintainable data flow across presentation, domain, and data layers.
 
 ---
 
-## Version 1.0 (Current Release)
+## Version 2.0 (Current Release)
 
-The initial release establishes the core networking, data mapping, and presentation layers for remote recipe browsing:
+Version 2.0 introduces offline-first local storage, user recipe creation, dynamic theme switching, and multi-color culinary palettes:
 
-### Core Features
+### Shipped Features
 
-- **Remote Recipe Catalog**: Fetches real-time recipe collections via REST endpoints from DummyJSON using the Ktor HTTP client.
-- **Cuisine and Category Filtering**: Dynamically extracts and presents cuisine categories (e.g., Italian, Asian, Mexican) as interactive filter chips.
-- **Responsive Recipe Grid**: Two-column responsive layout showcasing dish imagery, cuisine tags, calorie counts, cook times, and user ratings.
-- **Detailed Recipe View**:
-  - Full-width hero image loaded asynchronously with Coil 3.
-  - Nutritional and preparation metrics (prep time, cook time, servings, difficulty level, calories per serving).
-  - Categorization badges (meal types and tags).
-  - Structured ingredient checklist.
-  - Numbered, step-by-step cooking instructions.
-- **Type-Safe Navigation**: Built on Jetpack Navigation Compose using Kotlinx Serialization route objects.
-- **State and Error Handling**: Reactive UI state management with dedicated loading indicators, empty states, and error recovery actions.
-- **Splash Screen Integration**: Implements the official AndroidX Core SplashScreen API for seamless application launch.
+- **Offline-First Local Storage (Room Database)**:
+  - Robust SQLite persistence for user-created recipes using Android Jetpack Room (Entities, DAOs, Database, and TypeConverters).
+  - Reactive Flow observation across repositories and ViewModels.
+- **User Recipe Creation ("Add Recipe" UI)**:
+  - Comprehensive creation form with photo picker (Coil 3 image preview & deletion).
+  - Dynamic list builders for ingredients and cooking instructions.
+  - Form validation for required fields, prep/cook times, servings, and calorie counts.
+- **"My Recipes" & Personal Detail View**:
+  - Dedicated screen listing all user-authored local recipes in a responsive 2-column grid with empty states.
+  - Interactive personal recipe detail view featuring hero imagery, metadata chips, interactive ingredient check-lists, numbered instruction steps, and delete confirmation dialogs.
+- **Dynamic Theme Engine & Multi-Color Palettes**:
+  - DataStore-backed theme preferences (`theme_preferences`).
+  - System, Light, and Dark appearance mode switching.
+  - 4 distinctive culinary color palettes:
+    * **Warm Orange** (Classic culinary orange #E64A19)
+    * **Herb & Mint** (Fresh basil #2E7D32)
+    * **Berry & Wine** (Rich plum #AD1457)
+    * **Saffron & Honey** (Golden amber #E65100)
+- **Material 3 Bottom Navigation**:
+  - Seamless tab navigation between **Explore** (Home), **My Recipes**, and **Settings**, hidden automatically on detail and creation screens.
+- **Settings & Appearance Screen**:
+  - In-app appearance mode toggle and color palette selector with real-time UI updates.
+  - Version 3.0 roadmap profile placeholder card prepared for future Firebase Auth integration.
 
 ---
 
-## Version 2.0 (Planned Roadmap)
+## Version 3.0 (Planned Roadmap)
 
-The upcoming release expands functionality with offline-first capabilities, user contributions, and customized theming:
-
-1. **User Recipe Creation (Local Storage with Room Database)**
-   - Allow users to author and save custom recipes directly on their device.
-   - Offline-first persistence integrated into the Data Layer using Android Jetpack Room (Entity, DAO, and Database architecture).
-   - Fields for custom titles, prep/cook times, servings, ingredients list, and instruction steps.
-
-2. **Theme Change Control**
-   - In-app toggle action allowing users to switch themes dynamically without restarting the application.
-
-3. **Multi-Color Palettes**
-   - Dedicated color palettes customized for different themes (light, dark, and specialized culinary palettes).
-
-4. **Dedicated "My Recipes" Screen**
-   - Independent screen designed specifically to list, organize, and manage user-created local recipes separate from the remote catalog.
+- **Firebase Authentication**: Google Sign-In and Email/Password authentication.
+- **Cloud Firestore Sync**: Cloud backup and synchronization of custom recipes across devices.
+- **Community & Social Sharing**: Public recipe sharing, user ratings, and community reviews.
+- **Smart Meal Planning**: Weekly meal planner calendar and automated grocery list export.
 
 ---
 
 ## Clean Architecture Model
 
-The application follows the **Clean Architecture** software design pattern, organizing the codebase into three decoupled layers with specific responsibilities:
+The application follows the **Clean Architecture** software design pattern, organizing the codebase into three decoupled layers:
 
 ### 1. Presentation Layer
-- **Compose UI**: Declarative screens, composable components, top app bars, and responsive grids.
-- **ViewModels (State Holders)**: Manage screen state, handle UI events, and communicate with the domain/data layer.
-- **User Interaction**: Handles user actions such as category selection, navigation clicks, and retry requests.
+- **Compose UI**: Declarative screens, composable components, Material 3 bottom navigation, and responsive grids.
+- **ViewModels (State Holders)**: Manage reactive UI state (`StateFlow`), handle user interactions, and coordinate with repositories.
 
 ### 2. Domain Layer
-- **Business Logic**: Core domain definitions and validation rules independent of frameworks.
-- **Repository Interfaces**: Clean contracts (e.g., `RecipeRepository`) that define data access rules without exposing implementation details.
-- **Use Cases / Interactors**: Encapsulate specific business rules and operations (as features scale).
+- **Business Logic**: Core domain models (`Recipe`, `UserRecipe`, `AppThemeConfig`, `ThemeMode`, `ColorPalette`) independent of frameworks.
+- **Repository Interfaces**: Clean contracts (`RecipeRepository`, `UserRecipeRepository`, `ThemePreferencesRepository`) defining data access rules.
 
 ### 3. Data Layer
-- **Data Sources & DTOs**: Models representing external network payloads (`Recipe`, `RecipeResponse`, `AddRecipeRequest`).
-- **API Services**: Network communication powered by Ktor Client (`RecipeAPIService`, `KtorClient`).
-- **Repository Implementations**: Concrete implementation (`RecipeRepositoryImplementation`) orchestrating network calls and returning clean domain models.
-- **Local Database (v2.0)**: Room database integration for offline caching and local user-created recipes.
+- **Remote Data Sources**: REST API communication via Ktor Client (`RecipeAPIService`, DTOs).
+- **Local Data Sources**: Room Database DAOs, entities, and kotlinx.serialization-powered type converters.
+- **Preferences DataStore**: Asynchronous preference storage for theme configuration.
+- **Repository Implementations**: Concrete orchestrators mapping data layer objects into clean domain models.
 
 ---
 
@@ -84,14 +83,15 @@ The application follows the **Clean Architecture** software design pattern, orga
 
 | Layer / Dependency | Technology | Purpose |
 |---|---|---|
-| **Architecture Pattern** | Clean Architecture | Separation of concerns (Presentation, Domain, Data) |
+| **Architecture Pattern** | Clean Architecture | Strict separation of concerns (Presentation, Domain, Data) |
 | **Language** | Kotlin | Primary programming language |
-| **UI Framework** | Jetpack Compose + Material 3 | Declarative UI and design system |
-| **Networking** | Ktor Client (Android Engine) | Asynchronous HTTP requests and content negotiation |
+| **UI Framework** | Jetpack Compose + Material 3 | Declarative UI, Dynamic Color Schemes, & Design System |
+| **Networking** | Ktor Client (Android Engine) | Asynchronous HTTP requests and JSON content negotiation |
 | **Serialization** | Kotlinx Serialization | Type-safe JSON serialization/deserialization |
-| **Image Loading** | Coil 3 | Image caching and asynchronous rendering |
-| **Navigation** | Navigation Compose | Type-safe in-app screen navigation |
-| **Persistence (v2.0)** | Room Database | Local SQLite persistence for user recipes |
+| **Image Loading** | Coil 3 | Image caching, asynchronous rendering, and photo picking |
+| **Navigation** | Navigation Compose | Type-safe in-app screen navigation and Bottom Navigation |
+| **Local Persistence** | Room Database (SQLite) | Offline-first storage for user recipes with KSP |
+| **Preferences** | DataStore Preferences | Key-value storage for theme mode and color palettes |
 | **Minimum SDK** | API 28 (Android 9.0) | Target platform compatibility |
 | **Target SDK** | API 37 | Latest Android platform capabilities |
 
@@ -102,28 +102,30 @@ The application follows the **Clean Architecture** software design pattern, orga
 ```
 app/src/main/java/com/aayush/recipick/
 ├── MainActivity.kt                       # Application entry point with SplashScreen & NavHost
+├── ReciPickApp.kt                        # Application class initializing Room DB and DataStore
 │
 ├── presentation/                         # 1. Presentation Layer
 │   ├── components/                       # Shared UI components (TopBar, Loading, Error)
-│   ├── navigation/                       # Route declarations and Navigation Host
+│   ├── navigation/                       # Route declarations, BottomNavBar, and Navigation Host
 │   ├── screens/
 │   │   ├── home/                         # Home feed, category selector, recipe cards
-│   │   └── recipe_detail/                # Detail views, metadata chips, instruction steps
-│   └── viewmodels/                       # HomeViewModel, RecipeDetailsViewModel (State Holders)
+│   │   ├── recipe_detail/                # Remote recipe detail view
+│   │   ├── add_recipe/                   # Recipe creation form, photo picker, dynamic lists
+│   │   ├── my_recipes/                   # Local personal recipes grid
+│   │   ├── user_recipe_detail/           # Personal recipe detail view with checklist
+│   │   └── settings/                     # Appearance mode toggle & culinary palette selector
+│   └── viewmodels/                       # Home, Details, AddRecipe, MyRecipes, and Theme ViewModels
 │
 ├── domain/                               # 2. Domain Layer
-│   └── repository/
-│       └── RecipeRepository.kt           # Repository abstraction interface
+│   ├── model/                            # UserRecipe, AppThemeConfig, ThemeMode, ColorPalette
+│   └── repository/                       # RecipeRepository, UserRecipeRepository, ThemePreferencesRepository
 │
 ├── data/                                 # 3. Data Layer
-│   ├── remote/
-│   │   ├── KtorClient.kt                 # Ktor HTTP client configuration
-│   │   ├── RecipeAPIService.kt           # API endpoint declarations
-│   │   └── dto/                          # Remote Data Transfer Objects (DTOs)
-│   └── repository/
-│       └── RecipeRepositoryImplementation.kt # Concrete repository implementation
+│   ├── remote/                           # Ktor HTTP client, API service, and DTOs
+│   ├── local/                            # Room DB, DAOs, entities, converters, and mappers
+│   └── repository/                       # Concrete repository implementations
 │
-└── ui/theme/                             # Color definitions, typography, MaterialTheme
+└── ui/theme/                             # 4 culinary color schemes, typography, and MaterialTheme
 ```
 
 ---
@@ -132,9 +134,9 @@ app/src/main/java/com/aayush/recipick/
 
 ### Prerequisites
 
-- Android Studio (Hedgehog, Ladybug, or newer recommended)
+- Android Studio (Ladybug, Meerkat, or newer recommended)
 - JDK 11 or higher
-- Android SDK with API 34+ installed
+- Android SDK with API 37 installed
 
 ### Build and Run
 
@@ -153,8 +155,8 @@ app/src/main/java/com/aayush/recipick/
 ## API Reference
 
 ReciPick consumes public endpoints provided by the [DummyJSON Recipes API](https://dummyjson.com/docs/recipes):
-- `GET /recipes` — Retrieves a paginated list of recipes with nutritional and instructional data.
-- `GET /recipes/{id}` — Retrieves detailed data for a specific recipe.
+- `GET /recipes` — Retrieves a paginated list of remote recipes.
+- `GET /recipes/{id}` — Retrieves detailed data for a specific remote recipe.
 
 ---
 
