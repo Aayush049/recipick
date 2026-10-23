@@ -1,23 +1,13 @@
 # ReciPick
 
-<div align="center">
-  <img src="art/recipick_app_icon.jpg" alt="ReciPick Icon" width="110" style="border-radius: 20px;" />
-  <h3>Modern Android Recipe Application</h3>
-  <p>A recipe discovery and meal preparation application built with Jetpack Compose, Kotlin, and Clean Architecture.</p>
+[![Version](https://img.shields.io/badge/Version-1.0-orange.svg)](https://github.com/Aayush049/recipick)
+[![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-brightgreen.svg)](https://developer.android.com/topic/architecture)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg)](https://kotlinlang.org/)
+[![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%7C%20Material%203-blue.svg)](https://developer.android.com/jetpack/compose)
+[![Ktor](https://img.shields.io/badge/Network-Ktor%203.6.0-black.svg)](https://ktor.io/)
 
-  [![Version](https://img.shields.io/badge/Version-1.0-orange.svg)](https://github.com/Aayush049/recipick)
-  [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
-  [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-brightgreen.svg)](https://developer.android.com/topic/architecture)
-  [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg)](https://kotlinlang.org/)
-  [![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%7C%20Material%203-blue.svg)](https://developer.android.com/jetpack/compose)
-  [![Ktor](https://img.shields.io/badge/Network-Ktor%203.6.0-black.svg)](https://ktor.io/)
-</div>
-
----
-
-<div align="center">
-  <img src="art/recipick_brand_showcase.jpg" alt="ReciPick Showcase" width="800" />
-</div>
+A modern recipe discovery and meal preparation application built with Jetpack Compose, Kotlin, and Clean Architecture.
 
 ---
 
@@ -44,7 +34,7 @@ The initial release establishes the core networking, data mapping, and presentat
   - Numbered, step-by-step cooking instructions.
 - **Type-Safe Navigation**: Built on Jetpack Navigation Compose using Kotlinx Serialization route objects.
 - **State and Error Handling**: Reactive UI state management with dedicated loading indicators, empty states, and error recovery actions.
-- **Splash Screen Integration**: Implements the official AndroidX Core SplashScreen API for seamless application launch.
+- **Splash Screen Integration**: Implements the official AndroidX Core SplashScreen API using the application logo from drawable resources for seamless startup.
 
 ---
 
