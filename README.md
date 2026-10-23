@@ -1,22 +1,12 @@
 # ReciPick
 
 <div align="center">
-  <img src="art/recipick_app_icon.jpg" alt="ReciPick Icon" width="110" style="border-radius: 20px;" />
-  <h3>Modern Android Recipe Application</h3>
-  <p>A recipe discovery and meal preparation application built with Jetpack Compose, Kotlin, and Clean Architecture.</p>
-
   [![Version](https://img.shields.io/badge/Version-1.0-orange.svg)](https://github.com/Aayush049/recipick)
   [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
   [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-brightgreen.svg)](https://developer.android.com/topic/architecture)
   [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg)](https://kotlinlang.org/)
   [![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%7C%20Material%203-blue.svg)](https://developer.android.com/jetpack/compose)
   [![Ktor](https://img.shields.io/badge/Network-Ktor%203.6.0-black.svg)](https://ktor.io/)
-</div>
-
----
-
-<div align="center">
-  <img src="art/recipick_brand_showcase.jpg" alt="ReciPick Showcase" width="800" />
 </div>
 
 ---
@@ -71,10 +61,6 @@ The upcoming release expands functionality with offline-first capabilities, user
 ## Clean Architecture Model
 
 The application follows the **Clean Architecture** software design pattern, organizing the codebase into three decoupled layers with specific responsibilities:
-
-<div align="center">
-  <img src="art/clean_architecture.png" alt="Clean Architecture Diagram" width="800" />
-</div>
 
 ### 1. Presentation Layer
 - **Compose UI**: Declarative screens, composable components, top app bars, and responsive grids.
