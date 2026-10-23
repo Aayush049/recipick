@@ -4,30 +4,20 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import com.aayush.recipick.presentation.viewmodels.AddRecipeViewModel
 import com.aayush.recipick.ui.theme.Orange
 
@@ -39,9 +29,6 @@ fun AddRecipeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
-
-    var ingredientInput by remember { mutableStateOf("") }
-    var instructionInput by remember { mutableStateOf("") }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -84,49 +71,15 @@ fun AddRecipeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Photo Picker Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.LightGray.copy(alpha = 0.3f))
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                if (uiState.imageUri != null) {
-                    AsyncImage(
-                        model = uiState.imageUri,
-                        contentDescription = "Recipe Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+            RecipePhotoPicker(
+                imageUri = uiState.imageUri,
+                onPickPhotoClick = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
-                    IconButton(
-                        onClick = { viewModel.setImageUri(null) },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Remove Image",
-                            tint = Color.White
-                        )
-                    }
-                } else {
-                    OutlinedButton(
-                        onClick = {
-                            photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        }
-                    ) {
-                        Icon(imageVector = Icons.Default.Image, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Add Recipe Photo")
-                    }
-                }
-            }
+                },
+                onRemovePhotoClick = { viewModel.setImageUri(null) }
+            )
 
             // Recipe Title
             OutlinedTextField(
@@ -167,7 +120,7 @@ fun AddRecipeScreen(
                 )
             }
 
-            // Times, Servings, Calories
+            // Prep & Cook Time
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -190,6 +143,7 @@ fun AddRecipeScreen(
                 )
             }
 
+            // Servings & Calories
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -212,117 +166,33 @@ fun AddRecipeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            // Ingredients Section
-            Text(text = "Ingredients *", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = ingredientInput,
-                    onValueChange = { ingredientInput = it },
-                    label = { Text("Add ingredient") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                )
-                Button(
-                    onClick = {
-                        viewModel.addIngredient(ingredientInput)
-                        ingredientInput = ""
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Orange)
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
-                }
-            }
-            if (uiState.ingredientsError != null) {
-                Text(
-                    text = uiState.ingredientsError!!,
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 4.dp, top = 2.dp)
-                )
-            }
+            // Dynamic Ingredients Section
+            DynamicListSection(
+                title = "Ingredients *",
+                placeholder = "Add ingredient (e.g., 200g Pasta)",
+                items = uiState.ingredients,
+                onAddItem = viewModel::addIngredient,
+                onRemoveItem = viewModel::removeIngredient,
+                errorMessage = uiState.ingredientsError,
+                isNumbered = false
+            )
 
-            uiState.ingredients.forEachIndexed { index, ingredient ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.15f))
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = "• $ingredient", modifier = Modifier.weight(1f))
-                        IconButton(onClick = { viewModel.removeIngredient(index) }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Remove", tint = Color.Gray)
-                        }
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(4.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Dynamic Instructions Section
+            DynamicListSection(
+                title = "Instructions *",
+                placeholder = "Add step (e.g., Boil water for 10 mins)",
+                items = uiState.instructions,
+                onAddItem = viewModel::addInstruction,
+                onRemoveItem = viewModel::removeInstruction,
+                errorMessage = uiState.instructionsError,
+                isNumbered = true
+            )
 
-            // Instructions Section
-            Text(text = "Instructions *", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = instructionInput,
-                    onValueChange = { instructionInput = it },
-                    label = { Text("Add step") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                )
-                Button(
-                    onClick = {
-                        viewModel.addInstruction(instructionInput)
-                        instructionInput = ""
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Orange)
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Step")
-                }
-            }
-            if (uiState.instructionsError != null) {
-                Text(
-                    text = uiState.instructionsError!!,
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 4.dp, top = 2.dp)
-                )
-            }
-
-            uiState.instructions.forEachIndexed { index, instruction ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.15f))
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = "${index + 1}. $instruction", modifier = Modifier.weight(1f))
-                        IconButton(onClick = { viewModel.removeInstruction(index) }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Remove", tint = Color.Gray)
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Save Button
             Button(
