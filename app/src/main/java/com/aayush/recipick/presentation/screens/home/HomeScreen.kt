@@ -39,7 +39,6 @@ import com.aayush.recipick.presentation.viewmodels.HomeViewModel
 fun HomeScreen(
     onRecipeClick: (Int) -> Unit,
     onAddRecipeClick: () -> Unit,
-    onMyRecipesClick: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     Scaffold(
@@ -50,15 +49,6 @@ fun HomeScreen(
                         text = "ReciPick",
                         fontWeight = FontWeight.Bold
                     )
-                },
-                actions = {
-                    IconButton(onClick = onMyRecipesClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                            contentDescription = "My Recipes",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,

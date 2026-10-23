@@ -22,7 +22,6 @@ import com.aayush.recipick.presentation.viewmodels.MyRecipesViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyRecipesScreen(
-    onBack: () -> Unit,
     onAddRecipeClick: () -> Unit,
     onRecipeClick: (Int) -> Unit,
     viewModel: MyRecipesViewModel
@@ -33,14 +32,6 @@ fun MyRecipesScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = "My Recipes", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
