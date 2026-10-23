@@ -11,10 +11,11 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MenuOpen
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aayush.recipick.presentation.components.ErrorMessage
 import com.aayush.recipick.presentation.components.LoadingIndicator
-import com.aayush.recipick.presentation.components.MyTopAppBar
 import com.aayush.recipick.presentation.viewmodels.HomeViewModel
 import com.aayush.recipick.ui.theme.Orange
 
@@ -37,6 +37,7 @@ import com.aayush.recipick.ui.theme.Orange
 @Composable
 fun HomeScreen(
     onRecipeClick: (Int) -> Unit,
+    onAddRecipeClick: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     Scaffold(
@@ -54,6 +55,18 @@ fun HomeScreen(
                     navigationIconContentColor = Color.DarkGray
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddRecipeClick,
+                containerColor = Orange,
+                contentColor = Color.White
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Recipe"
+                )
+            }
         }
     ) { innerPadding ->
 
