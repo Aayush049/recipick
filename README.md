@@ -161,9 +161,3 @@ ReciPick consumes public endpoints provided by the [DummyJSON Recipes API](https
 ## Author
 
 - **Aayush** — [GitHub Profile](https://github.com/Aayush049)
-
----
-
-## License
-
-This project is licensed under the MIT License.
