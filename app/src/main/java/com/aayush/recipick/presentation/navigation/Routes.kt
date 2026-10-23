@@ -10,3 +10,9 @@ data class RecipeDetailsRoute(val recipeId: Int)
 
 @Serializable
 object AddRecipeRoute
+
+@Serializable
+object MyRecipesRoute
+
+@Serializable
+data class UserRecipeDetailRoute(val recipeId: Int)
