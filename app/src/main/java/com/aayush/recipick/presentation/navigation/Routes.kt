@@ -7,3 +7,6 @@ object HomeRoute
 
 @Serializable
 data class RecipeDetailsRoute(val recipeId: Int)
+
+@Serializable
+object AddRecipeRoute
