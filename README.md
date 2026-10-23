@@ -34,7 +34,7 @@ The initial release establishes the core networking, data mapping, and presentat
   - Numbered, step-by-step cooking instructions.
 - **Type-Safe Navigation**: Built on Jetpack Navigation Compose using Kotlinx Serialization route objects.
 - **State and Error Handling**: Reactive UI state management with dedicated loading indicators, empty states, and error recovery actions.
-- **Splash Screen Integration**: Implements the official AndroidX Core SplashScreen API using the application logo from drawable resources for seamless startup.
+- **Splash Screen Integration**: Implements the official AndroidX Core SplashScreen API for seamless application launch.
 
 ---
 

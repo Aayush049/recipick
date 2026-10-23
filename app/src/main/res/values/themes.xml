@@ -8,7 +8,7 @@
         <!-- Background color of the splash screen -->
         <item name="windowSplashScreenBackground">@color/orange</item>
         <!-- Center icon -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/recipick_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <!-- Theme to switch to once splash screen is dismissed -->
         <item name="postSplashScreenTheme">@style/Theme.Recipick</item>
     </style>
