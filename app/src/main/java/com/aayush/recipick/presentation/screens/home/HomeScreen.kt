@@ -1,14 +1,10 @@
 package com.aayush.recipick.presentation.screens.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -16,21 +12,19 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuOpen
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aayush.recipick.presentation.components.ErrorMessage
 import com.aayush.recipick.presentation.components.LoadingIndicator
+import com.aayush.recipick.presentation.components.MyTopAppBar
 import com.aayush.recipick.presentation.viewmodels.HomeViewModel
 import com.aayush.recipick.ui.theme.Orange
 
@@ -42,14 +36,10 @@ fun HomeScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Recipes",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.DarkGray
-                    )
-                }
+            MyTopAppBar(
+                title = "ReciPick",
+                onBackClick = {},
+                icon = null
             )
         }
     ) { innerPadding ->
@@ -63,42 +53,10 @@ fun HomeScreen(
                 viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
 
                 viewModel.errorMessage != null -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Orange.copy(0.03f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column() {
-                            Text(
-                                text = viewModel.errorMessage ?: "",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Orange
-                            )
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            Button(
-                                onClick = {
-                                    viewModel.fetchRecipes()
-                                },
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 24.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    contentColor = Color.White,
-                                    containerColor = Orange
-                                )
-                            ) {
-                                Text(
-                                    text = "Retry",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
+                    ErrorMessage(
+                        errorMessage = viewModel.errorMessage,
+                        onRetry = { viewModel.fetchRecipes() }
+                    )
                 }
 
                 else -> {
