@@ -1,12 +1,22 @@
 # ReciPick
 
 <div align="center">
+  <img src="art/recipick_app_icon.jpg" alt="ReciPick Icon" width="110" style="border-radius: 20px;" />
+  <h3>Modern Android Recipe Application</h3>
+  <p>A recipe discovery and meal preparation application built with Jetpack Compose, Kotlin, and Clean Architecture.</p>
+
   [![Version](https://img.shields.io/badge/Version-1.0-orange.svg)](https://github.com/Aayush049/recipick)
   [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
   [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-brightgreen.svg)](https://developer.android.com/topic/architecture)
   [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg)](https://kotlinlang.org/)
   [![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%7C%20Material%203-blue.svg)](https://developer.android.com/jetpack/compose)
   [![Ktor](https://img.shields.io/badge/Network-Ktor%203.6.0-black.svg)](https://ktor.io/)
+</div>
+
+---
+
+<div align="center">
+  <img src="art/recipick_brand_showcase.jpg" alt="ReciPick Showcase" width="800" />
 </div>
 
 ---
@@ -101,7 +111,7 @@ The application follows the **Clean Architecture** software design pattern, orga
 
 ```
 app/src/main/java/com/aayush/recipick/
-├── MainActivity.kt                       # Entry point with SplashScreen & NavHost
+├── MainActivity.kt                       # Application entry point with SplashScreen & NavHost
 │
 ├── presentation/                         # 1. Presentation Layer
 │   ├── components/                       # Shared UI components (TopBar, Loading, Error)
@@ -128,6 +138,28 @@ app/src/main/java/com/aayush/recipick/
 
 ---
 
+## Getting Started
+
+### Prerequisites
+
+- Android Studio (Hedgehog, Ladybug, or newer recommended)
+- JDK 11 or higher
+- Android SDK with API 34+ installed
+
+### Build and Run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Aayush049/recipick.git
+   cd recipick
+   ```
+
+2. Open the project in Android Studio.
+3. Allow Gradle to synchronize dependencies.
+4. Select a connected device or emulator (API 28+) and run the project (`Shift + F10`).
+
+---
+
 ## API Reference
 
 ReciPick consumes public endpoints provided by the [DummyJSON Recipes API](https://dummyjson.com/docs/recipes):
@@ -141,3 +173,7 @@ ReciPick consumes public endpoints provided by the [DummyJSON Recipes API](https
 - **Aayush** — [GitHub Profile](https://github.com/Aayush049)
 
 ---
+
+## License
+
+This project is licensed under the MIT License.
