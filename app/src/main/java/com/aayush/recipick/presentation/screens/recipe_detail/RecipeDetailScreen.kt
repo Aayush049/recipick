@@ -47,11 +47,14 @@ fun RecipeDetailScreen(
             when{
                 viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
 
-                viewModel.errorMessage != null -> {
-                    ErrorMessage(
-                        errorMessage = viewModel.errorMessage,
-                        onRetry = { viewModel.fetchRecipeDetails(recipeId) }
-                    )
+                viewModel.errorMessage != null -> ErrorMessage (
+                    errorMessage = viewModel.errorMessage,
+                    onRetry = { viewModel.fetchRecipeDetails(recipeId) }
+                )
+
+                viewModel.recipe != null -> {
+                    //Recipe Details
+                    RecipeDetailContent(recipeDetails = viewModel.recipe!!)
                 }
             }
         }

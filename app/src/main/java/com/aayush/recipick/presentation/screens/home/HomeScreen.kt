@@ -52,12 +52,10 @@ fun HomeScreen(
             when {
                 viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
 
-                viewModel.errorMessage != null -> {
-                    ErrorMessage(
-                        errorMessage = viewModel.errorMessage,
-                        onRetry = { viewModel.fetchRecipes() }
-                    )
-                }
+                viewModel.errorMessage != null -> ErrorMessage(
+                    errorMessage = viewModel.errorMessage,
+                    onRetry = { viewModel.fetchRecipes() }
+                )
 
                 else -> {
                     LazyVerticalGrid(
