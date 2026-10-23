@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="128dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+
+    <!-- Background Squircle / Soft Tile -->
+    <path
+        android:fillColor="#FF5722"
+        android:pathData="M24,12 C12,12 8,24 8,36 L8,92 C8,104 12,116 24,116 L104,116 C116,116 120,104 120,92 L120,36 C120,24 116,12 104,12 Z" />
+
+    <!-- Subtle Depth Highlight -->
+    <path
+        android:fillColor="#1AFFFFFF"
+        android:pathData="M24,12 C12,12 8,24 8,36 L8,64 C24,60 104,50 120,64 L120,36 C120,24 116,12 104,12 Z" />
+
+    <!-- Chef Hat - Crown Puffs -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,32 C58.5,32 54,35.5 52.3,40.5 C49.8,38.3 46.5,37 42.8,37 C34.6,37 28,43.6 28,51.8 C28,53.2 28.2,54.6 28.6,55.9 C24.8,58.3 22.3,62.6 22.3,67.5 C22.3,74.7 28.1,80.5 35.3,80.5 L92.7,80.5 C99.9,80.5 105.7,74.7 105.7,67.5 C105.7,62.6 103.2,58.3 99.4,55.9 C99.8,54.6 100,53.2 100,51.8 C100,43.6 93.4,37 85.2,37 C81.5,37 78.2,38.3 75.7,40.5 C74,35.5 69.5,32 64,32 Z" />
+
+    <!-- Hat Brim / Band -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,83 C34,80.8 35.8,79 38,79 L90,79 C92.2,79 94,80.8 94,83 L94,88 C94,90.2 92.2,92 90,92 L38,92 C35.8,92 34,90.2 34,88 Z" />
+
+    <!-- Pick Ribbon / Bookmark (accent in warm golden orange) -->
+    <path
+        android:fillColor="#FF7043"
+        android:pathData="M56,79 L72,79 L72,98 L64,93 L56,98 Z" />
+
+    <!-- Pick / Star Accents -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M64,52 L66,57 L71,57.5 L67,61 L68.2,66 L64,63 L59.8,66 L61,61 L57,57.5 L62,57 Z" />
+</vector>

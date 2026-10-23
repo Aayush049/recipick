@@ -2,4 +2,14 @@
 <resources>
 
     <style name="Theme.Recipick" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash Screen API Theme -->
+    <style name="Theme.Recipick.Splash" parent="Theme.SplashScreen">
+        <!-- Background color of the splash screen -->
+        <item name="windowSplashScreenBackground">@color/orange</item>
+        <!-- Center icon -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!-- Theme to switch to once splash screen is dismissed -->
+        <item name="postSplashScreenTheme">@style/Theme.Recipick</item>
+    </style>
 </resources>
