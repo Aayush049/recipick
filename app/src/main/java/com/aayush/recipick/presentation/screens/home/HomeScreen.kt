@@ -25,7 +25,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,7 +33,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aayush.recipick.presentation.components.ErrorMessage
 import com.aayush.recipick.presentation.components.LoadingIndicator
 import com.aayush.recipick.presentation.viewmodels.HomeViewModel
-import com.aayush.recipick.ui.theme.Orange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,22 +56,22 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.MenuBook,
                             contentDescription = "My Recipes",
-                            tint = Color.DarkGray
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.DarkGray,
-                    navigationIconContentColor = Color.DarkGray
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddRecipeClick,
-                containerColor = Orange,
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -135,7 +134,7 @@ fun HomeScreen(
                                         text = "No Recipes Found",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Orange
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }

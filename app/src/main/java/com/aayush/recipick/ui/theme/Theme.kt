@@ -1,53 +1,106 @@
 package com.aayush.recipick.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import com.aayush.recipick.domain.model.AppThemeConfig
+import com.aayush.recipick.domain.model.ColorPalette
+import com.aayush.recipick.domain.model.ThemeMode
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+// ── ORANGE ──────────────────────────────────────────────────────────────────
+private val OrangeLightColorScheme = lightColorScheme(
+    primary = OrangePrimaryLight,
+    onPrimary = OrangeOnPrimaryLight,
+    background = OrangeBackgroundLight,
+    onBackground = OrangeOnBackgroundLight,
+    surface = OrangeSurfaceLight,
+    onSurface = OrangeOnSurfaceLight
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+private val OrangeDarkColorScheme = darkColorScheme(
+    primary = OrangePrimaryDark,
+    onPrimary = OrangeOnPrimaryDark,
+    background = OrangeBackgroundDark,
+    onBackground = OrangeOnBackgroundDark,
+    surface = OrangeSurfaceDark,
+    onSurface = OrangeOnSurfaceDark
+)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// ── MINT ─────────────────────────────────────────────────────────────────────
+private val MintLightColorScheme = lightColorScheme(
+    primary = MintPrimaryLight,
+    onPrimary = MintOnPrimaryLight,
+    background = MintBackgroundLight,
+    onBackground = MintOnBackgroundLight,
+    surface = MintSurfaceLight,
+    onSurface = MintOnSurfaceLight
+)
+
+private val MintDarkColorScheme = darkColorScheme(
+    primary = MintPrimaryDark,
+    onPrimary = MintOnPrimaryDark,
+    background = MintBackgroundDark,
+    onBackground = MintOnBackgroundDark,
+    surface = MintSurfaceDark,
+    onSurface = MintOnSurfaceDark
+)
+
+// ── BERRY ─────────────────────────────────────────────────────────────────────
+private val BerryLightColorScheme = lightColorScheme(
+    primary = BerryPrimaryLight,
+    onPrimary = BerryOnPrimaryLight,
+    background = BerryBackgroundLight,
+    onBackground = BerryOnBackgroundLight,
+    surface = BerrySurfaceLight,
+    onSurface = BerryOnSurfaceLight
+)
+
+private val BerryDarkColorScheme = darkColorScheme(
+    primary = BerryPrimaryDark,
+    onPrimary = BerryOnPrimaryDark,
+    background = BerryBackgroundDark,
+    onBackground = BerryOnBackgroundDark,
+    surface = BerrySurfaceDark,
+    onSurface = BerryOnSurfaceDark
+)
+
+// ── SAFFRON ───────────────────────────────────────────────────────────────────
+private val SaffronLightColorScheme = lightColorScheme(
+    primary = SaffronPrimaryLight,
+    onPrimary = SaffronOnPrimaryLight,
+    background = SaffronBackgroundLight,
+    onBackground = SaffronOnBackgroundLight,
+    surface = SaffronSurfaceLight,
+    onSurface = SaffronOnSurfaceLight
+)
+
+private val SaffronDarkColorScheme = darkColorScheme(
+    primary = SaffronPrimaryDark,
+    onPrimary = SaffronOnPrimaryDark,
+    background = SaffronBackgroundDark,
+    onBackground = SaffronOnBackgroundDark,
+    surface = SaffronSurfaceDark,
+    onSurface = SaffronOnSurfaceDark
 )
 
 @Composable
 fun RecipickTheme(
-    darkTheme: Boolean = false,
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    themeConfig: AppThemeConfig = AppThemeConfig(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val isDark = when (themeConfig.themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colorScheme = when (themeConfig.colorPalette) {
+        ColorPalette.ORANGE -> if (isDark) OrangeDarkColorScheme else OrangeLightColorScheme
+        ColorPalette.MINT -> if (isDark) MintDarkColorScheme else MintLightColorScheme
+        ColorPalette.BERRY -> if (isDark) BerryDarkColorScheme else BerryLightColorScheme
+        ColorPalette.SAFFRON -> if (isDark) SaffronDarkColorScheme else SaffronLightColorScheme
     }
 
     MaterialTheme(
