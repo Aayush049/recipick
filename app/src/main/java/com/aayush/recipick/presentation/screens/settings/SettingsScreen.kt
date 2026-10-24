@@ -48,7 +48,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // ── 1. Profile Placeholder Card (Version 3 Preview) ──────────────

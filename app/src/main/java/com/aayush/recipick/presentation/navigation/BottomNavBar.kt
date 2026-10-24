@@ -1,5 +1,10 @@
 package com.aayush.recipick.presentation.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Explore
@@ -11,24 +16,33 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
 sealed class BottomNavItem(
     val route: Any,
     val title: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val routeName: String
 ) {
-    object Home : BottomNavItem(HomeRoute, "Explore", Icons.Default.Explore)
-    object MyRecipes : BottomNavItem(MyRecipesRoute, "My Recipes", Icons.AutoMirrored.Filled.MenuBook)
-    object Settings : BottomNavItem(SettingsRoute, "Settings", Icons.Default.Settings)
+    object Home : BottomNavItem(HomeRoute, "Explore", Icons.Default.Explore, "HomeRoute")
+    object MyRecipes : BottomNavItem(MyRecipesRoute, "My Recipes", Icons.AutoMirrored.Filled.MenuBook, "MyRecipesRoute")
+    object Settings : BottomNavItem(SettingsRoute, "Settings", Icons.Default.Settings, "SettingsRoute")
 }
 
 @Composable
 fun BottomNavBar(
     navController: NavHostController,
-    currentRoute: Any?
+    currentDestination: NavDestination?
 ) {
     val items = listOf(
         BottomNavItem.Home,
@@ -38,26 +52,59 @@ fun BottomNavBar(
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        tonalElevation = 8.dp
     ) {
         items.forEach { item ->
-            val selected = currentRoute?.javaClass?.name == item.route::class.java.name
+            val selected = currentDestination?.hierarchy?.any { destination ->
+                destination.route?.contains(item.routeName) == true
+            } == true
 
             NavigationBarItem(
-                icon = { Icon(imageVector = item.icon, contentDescription = item.title) },
+                icon = {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        if (selected) {
+                            // Warm radial glow effect behind the active screen icon
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .background(
+                                        brush = Brush.radialGradient(
+                                            colors = listOf(
+                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.55f),
+                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
+                                                Color.Transparent
+                                            )
+                                        ),
+                                        shape = CircleShape
+                                    )
+                            )
+                        }
+
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.title,
+                            modifier = if (selected) Modifier.size(24.dp) else Modifier.size(22.dp)
+                        )
+                    }
+                },
                 label = {
                     Text(
                         text = item.title,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                        fontSize = if (selected) 12.sp else 11.sp
                     )
                 },
                 selected = selected,
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 ),
                 onClick = {
                     if (!selected) {

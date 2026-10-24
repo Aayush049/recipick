@@ -45,7 +45,8 @@ fun HomeScreen(
                 title = {
                     Text(
                         text = "ReciPick",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -85,7 +86,12 @@ fun HomeScreen(
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(16.dp),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 4.dp,
+                            bottom = 16.dp
+                        ),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {

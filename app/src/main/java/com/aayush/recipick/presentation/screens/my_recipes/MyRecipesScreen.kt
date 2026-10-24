@@ -31,7 +31,7 @@ fun MyRecipesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "My Recipes", fontWeight = FontWeight.Bold) },
+                title = { Text(text = "My Recipes", fontWeight = FontWeight.Bold, fontSize = 22.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
@@ -105,7 +105,12 @@ fun MyRecipesScreen(
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(16.dp),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 4.dp,
+                            bottom = 16.dp
+                        ),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {

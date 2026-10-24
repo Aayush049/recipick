@@ -1,5 +1,6 @@
 package com.aayush.recipick.presentation.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -43,9 +44,13 @@ fun RecipeNavHost() {
     } ?: true
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
-                BottomNavBar(navController = navController, currentRoute = navBackStackEntry?.destination)
+                BottomNavBar(
+                    navController = navController,
+                    currentDestination = navBackStackEntry?.destination
+                )
             }
         }
     ) { innerPadding ->
@@ -54,7 +59,7 @@ fun RecipeNavHost() {
             startDestination = HomeRoute,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable<HomeRoute> {
                 HomeScreen(
