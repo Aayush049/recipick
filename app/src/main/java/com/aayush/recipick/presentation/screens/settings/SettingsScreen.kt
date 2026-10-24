@@ -1,6 +1,7 @@
 package com.aayush.recipick.presentation.screens.settings
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -12,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,7 +116,7 @@ fun SettingsScreen(
                 }
             }
 
-            // ── 2. Theme Mode Section ────────────────────────────────────────
+            // ── 2. Theme Mode Section (Arranged in Column) ───────────────────
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     text = "Appearance Mode",
@@ -125,32 +125,65 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     ThemeMode.entries.forEach { mode ->
                         val selected = themeConfig.themeMode == mode
                         val label = when (mode) {
-                            ThemeMode.SYSTEM -> "System"
-                            ThemeMode.LIGHT -> "Light"
-                            ThemeMode.DARK -> "Dark"
+                            ThemeMode.SYSTEM -> "System Default"
+                            ThemeMode.LIGHT -> "Light Theme"
+                            ThemeMode.DARK -> "Dark Theme"
+                        }
+                        val subtitle = when (mode) {
+                            ThemeMode.SYSTEM -> "Follows your device system theme"
+                            ThemeMode.LIGHT -> "Always use bright, warm light theme"
+                            ThemeMode.DARK -> "Always use relaxed dark theme"
                         }
 
-                        OutlinedButton(
-                            onClick = { themeViewModel.setThemeMode(mode) },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-                                contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { themeViewModel.setThemeMode(mode) },
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                                else MaterialTheme.colorScheme.surface
                             ),
-                            border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                            border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                            else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text(
-                                text = label,
-                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = 13.sp
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = label,
+                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
+                                        fontSize = 15.sp,
+                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = subtitle,
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+
+                                RadioButton(
+                                    selected = selected,
+                                    onClick = { themeViewModel.setThemeMode(mode) },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = MaterialTheme.colorScheme.primary,
+                                        unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -190,22 +223,6 @@ fun SettingsScreen(
                         ) {
                             Text(text = "Theme", color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(text = "Warm Orange", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = "Architecture", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(text = "Clean Architecture", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = "Tech Stack", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(text = "Compose, Material 3, Room, Ktor", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
