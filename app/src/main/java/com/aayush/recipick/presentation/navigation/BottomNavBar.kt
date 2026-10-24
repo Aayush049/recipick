@@ -1,10 +1,5 @@
 package com.aayush.recipick.presentation.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Explore
@@ -16,10 +11,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,34 +53,10 @@ fun BottomNavBar(
 
             NavigationBarItem(
                 icon = {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        if (selected) {
-                            // Warm radial glow effect behind the active screen icon
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .background(
-                                        brush = Brush.radialGradient(
-                                            colors = listOf(
-                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.55f),
-                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
-                                                Color.Transparent
-                                            )
-                                        ),
-                                        shape = CircleShape
-                                    )
-                            )
-                        }
-
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.title,
-                            modifier = if (selected) Modifier.size(24.dp) else Modifier.size(22.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = item.title
+                    )
                 },
                 label = {
                     Text(
