@@ -1,18 +1,42 @@
 *.iml
 .gradle
+.kotlin
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Android build outputs & binaries
+*.apk
+*.ap_
+*.aab
+**/build/
+**/release/
+app/release/
+
+# Keystores & Signing secrets
+*.jks
+*.keystore
+*.key
+*.p12
+*.pem
+*.pk8
+
+# Secret property files & configs
+*secret*.properties
+key.properties
+signing.properties
+release.properties
+google-services.json
+GoogleService-Info.plist
+
+# Environment files
+.env
+.env.*
 
 # Local-only dev files — never push
 CLAUDE.md

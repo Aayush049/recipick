@@ -11,16 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.aayush.recipick.data.remote.dto.Recipe
 import com.aayush.recipick.presentation.components.LoadingIndicator
-import com.aayush.recipick.ui.theme.Orange
 
 @Composable
 fun RecipeCard(
@@ -41,11 +39,11 @@ fun RecipeCard(
             .fillMaxWidth()
             .clickable(onClick = onClickk),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors( containerColor = Color.White ),
-        elevation = CardDefaults.cardElevation( defaultElevation = 0.dp ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = CardDefaults.outlinedCardBorder()
     ) {
-        Column{
+        Column {
             SubcomposeAsyncImage(
                 model = recipe.image,
                 contentDescription = recipe.name,
@@ -59,7 +57,6 @@ fun RecipeCard(
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
-
                     ) {
                         Text(
                             text = "🍲",
@@ -78,7 +75,7 @@ fun RecipeCard(
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = Color.DarkGray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -92,7 +89,7 @@ fun RecipeCard(
                         text = recipe.cuisine,
                         fontSize = 12.sp,
                         maxLines = 1,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
@@ -100,7 +97,7 @@ fun RecipeCard(
                     Box(
                         modifier = Modifier
                             .background(
-                                color = Orange.copy(0.1f),
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -109,7 +106,7 @@ fun RecipeCard(
                             text = recipe.difficulty,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Orange
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }

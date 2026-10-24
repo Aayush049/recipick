@@ -1,6 +1,7 @@
 package com.aayush.recipick.presentation.screens.add_recipe
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -8,11 +9,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aayush.recipick.ui.theme.Orange
 
 @Composable
 fun DynamicListSection(
@@ -21,9 +20,9 @@ fun DynamicListSection(
     items: List<String>,
     onAddItem: (String) -> Unit,
     onRemoveItem: (Int) -> Unit,
-    modifier: Modifier = Modifier,
     errorMessage: String? = null,
-    isNumbered: Boolean = false
+    isNumbered: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     var textInput by remember { mutableStateOf("") }
 
@@ -33,8 +32,9 @@ fun DynamicListSection(
     ) {
         Text(
             text = title,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Row(
@@ -45,18 +45,23 @@ fun DynamicListSection(
             OutlinedTextField(
                 value = textInput,
                 onValueChange = { textInput = it },
-                label = { Text(placeholder) },
+                placeholder = { Text(placeholder, fontSize = 14.sp) },
                 modifier = Modifier.weight(1f),
                 singleLine = true
             )
-            Button(
+
+            IconButton(
                 onClick = {
                     if (textInput.isNotBlank()) {
-                        onAddItem(textInput)
+                        onAddItem(textInput.trim())
                         textInput = ""
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Orange)
+                modifier = Modifier.size(48.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add $title")
             }
@@ -75,7 +80,8 @@ fun DynamicListSection(
             val label = if (isNumbered) "${index + 1}. $item" else "• $item"
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.15f))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Row(
                     modifier = Modifier
@@ -84,12 +90,16 @@ fun DynamicListSection(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = label, modifier = Modifier.weight(1f))
+                    Text(
+                        text = label,
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     IconButton(onClick = { onRemoveItem(index) }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Remove",
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

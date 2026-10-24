@@ -28,21 +28,19 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Whatshot
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.aayush.recipick.data.remote.dto.Recipe
-import com.aayush.recipick.ui.theme.Orange
 
 @Composable
 fun RecipeDetailContent(
@@ -51,7 +49,7 @@ fun RecipeDetailContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Orange.copy(0.03f))
+            .background(color = MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -71,7 +69,7 @@ fun RecipeDetailContent(
                 text = recipeDetails.name,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -112,7 +110,7 @@ fun RecipeDetailContent(
                 VerticalDivider(
                     modifier = Modifier.height(36.dp),
                     thickness = 1.dp,
-                    color = Color.Gray.copy(0.5f)
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 StatItem(
@@ -124,7 +122,7 @@ fun RecipeDetailContent(
                 VerticalDivider(
                     modifier = Modifier.height(36.dp),
                     thickness = 1.dp,
-                    color = Color.Gray.copy(0.5f)
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 StatItem(
@@ -136,7 +134,7 @@ fun RecipeDetailContent(
                 VerticalDivider(
                     modifier = Modifier.height(36.dp),
                     thickness = 1.dp,
-                    color = Color.Gray.copy(0.5f)
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 StatItem(
@@ -158,16 +156,15 @@ fun RecipeDetailContent(
                             .padding(top = 7.dp)
                             .size(6.dp)
                             .clip(shape = CircleShape)
-                            .background(color = Orange),
+                            .background(color = MaterialTheme.colorScheme.primary),
                     )
 
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Text(
                         text = ingredient,
-                        color = Color.DarkGray.copy(0.85f)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-
                 }
             }
         }
@@ -182,14 +179,14 @@ fun RecipeDetailContent(
                         modifier = Modifier
                             .size(24.dp)
                             .clip(shape = CircleShape)
-                            .background(color = Orange),
+                            .background(color = MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ){
                         Text(
                             text = "${index + 1}.",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
@@ -197,7 +194,7 @@ fun RecipeDetailContent(
 
                     Text(
                         text = instruction,
-                        color = Color.DarkGray.copy(0.85f)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

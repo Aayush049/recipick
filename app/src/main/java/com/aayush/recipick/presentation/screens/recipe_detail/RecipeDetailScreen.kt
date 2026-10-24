@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,7 +17,6 @@ import com.aayush.recipick.presentation.components.ErrorMessage
 import com.aayush.recipick.presentation.components.LoadingIndicator
 import com.aayush.recipick.presentation.components.MyTopAppBar
 import com.aayush.recipick.presentation.viewmodels.RecipeDetailsViewModel
-import com.aayush.recipick.ui.theme.Orange
 
 @Composable
 fun RecipeDetailScreen(
@@ -41,19 +41,17 @@ fun RecipeDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(color = Orange.copy(0.03f))
+                .background(color = MaterialTheme.colorScheme.background)
         ) {
-
-            when{
+            when {
                 viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
 
-                viewModel.errorMessage != null -> ErrorMessage (
+                viewModel.errorMessage != null -> ErrorMessage(
                     errorMessage = viewModel.errorMessage,
                     onRetry = { viewModel.fetchRecipeDetails(recipeId) }
                 )
 
                 viewModel.recipe != null -> {
-                    //Recipe Details
                     RecipeDetailContent(recipeDetails = viewModel.recipe!!)
                 }
             }

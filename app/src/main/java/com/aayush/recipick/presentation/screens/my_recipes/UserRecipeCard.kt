@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.aayush.recipick.domain.model.UserRecipe
-import com.aayush.recipick.ui.theme.Orange
 
 @Composable
 fun UserRecipeCard(
@@ -33,16 +31,17 @@ fun UserRecipeCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Recipe?") },
-            text = { Text("Are you sure you want to delete \"${recipe.name}\"? This action cannot be undone.") },
+            title = { Text(text = "Delete Recipe") },
+            text = { Text("Are you sure you want to delete \"${recipe.name}\"? This cannot be undone.") },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showDeleteDialog = false
                         onDelete()
-                    }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Delete")
                 }
             },
             dismissButton = {
@@ -59,7 +58,8 @@ fun UserRecipeCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = CardDefaults.outlinedCardBorder()
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -68,7 +68,7 @@ fun UserRecipeCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(130.dp)
-                    .background(Color.LightGray.copy(alpha = 0.3f))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             ) {
                 if (!recipe.imageUri.isNullOrBlank()) {
                     AsyncImage(
@@ -86,7 +86,7 @@ fun UserRecipeCard(
                             text = recipe.cuisine.take(1).uppercase(),
                             fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Orange.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
                     }
                 }
@@ -98,7 +98,7 @@ fun UserRecipeCard(
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
                         .size(32.dp)
-                        .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f), RoundedCornerShape(50))
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -120,7 +120,8 @@ fun UserRecipeCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Row(
@@ -131,7 +132,7 @@ fun UserRecipeCard(
                     Text(
                         text = recipe.cuisine,
                         fontSize = 11.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Row(
@@ -141,13 +142,13 @@ fun UserRecipeCard(
                         Icon(
                             imageVector = Icons.Default.Timer,
                             contentDescription = null,
-                            tint = Orange,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(12.dp)
                         )
                         Text(
                             text = "${recipe.prepTimeMinutes + recipe.cookTimeMinutes}m",
                             fontSize = 11.sp,
-                            color = Color.DarkGray,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Medium
                         )
                     }

@@ -18,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,7 +26,6 @@ import coil3.compose.AsyncImage
 import com.aayush.recipick.domain.model.UserRecipe
 import com.aayush.recipick.domain.repository.UserRecipeRepository
 import com.aayush.recipick.presentation.screens.recipe_detail.InfoChip
-import com.aayush.recipick.ui.theme.Orange
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,9 +105,9 @@ fun UserRecipeDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.DarkGray,
-                    navigationIconContentColor = Color.DarkGray
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         }
@@ -122,13 +120,17 @@ fun UserRecipeDetailScreen(
             when {
                 isLoading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Orange)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 }
 
                 recipe == null -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "Recipe not found", fontSize = 18.sp, color = Color.Gray)
+                        Text(
+                            text = "Recipe not found",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
@@ -146,7 +148,7 @@ fun UserRecipeDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(260.dp)
-                                .background(Color.LightGray.copy(alpha = 0.3f))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                         ) {
                             if (!currentRecipe.imageUri.isNullOrBlank()) {
                                 AsyncImage(
@@ -163,7 +165,7 @@ fun UserRecipeDetailScreen(
                                     Icon(
                                         imageVector = Icons.Default.RestaurantMenu,
                                         contentDescription = null,
-                                        tint = Orange.copy(alpha = 0.5f),
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                                         modifier = Modifier.size(80.dp)
                                     )
                                 }
@@ -186,16 +188,16 @@ fun UserRecipeDetailScreen(
                                     text = currentRecipe.name,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.DarkGray,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Surface(
-                                    color = Orange.copy(alpha = 0.15f),
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Text(
                                         text = "Personal",
-                                        color = Orange,
+                                        color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 12.sp,
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -231,7 +233,7 @@ fun UserRecipeDetailScreen(
                                 text = "Ingredients",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.DarkGray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
 
                             currentRecipe.ingredients.forEach { ingredient ->
@@ -239,9 +241,10 @@ fun UserRecipeDetailScreen(
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = if (checked) Color.LightGray.copy(alpha = 0.2f) else Color.White
+                                        containerColor = if (checked) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f) else MaterialTheme.colorScheme.surface
                                     ),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                    border = CardDefaults.outlinedCardBorder()
                                 ) {
                                     Row(
                                         modifier = Modifier
@@ -253,12 +256,12 @@ fun UserRecipeDetailScreen(
                                         Checkbox(
                                             checked = checked,
                                             onCheckedChange = { checked = it },
-                                            colors = CheckboxDefaults.colors(checkedColor = Orange)
+                                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                                         )
                                         Text(
                                             text = ingredient,
                                             fontSize = 15.sp,
-                                            color = if (checked) Color.Gray else Color.DarkGray
+                                            color = if (checked) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -271,14 +274,15 @@ fun UserRecipeDetailScreen(
                                 text = "Instructions",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.DarkGray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
 
                             currentRecipe.instructions.forEachIndexed { index, instruction ->
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                    border = CardDefaults.outlinedCardBorder()
                                 ) {
                                     Row(
                                         modifier = Modifier
@@ -288,14 +292,14 @@ fun UserRecipeDetailScreen(
                                         verticalAlignment = Alignment.Top
                                     ) {
                                         Surface(
-                                            color = Orange,
+                                            color = MaterialTheme.colorScheme.primary,
                                             shape = RoundedCornerShape(50),
                                             modifier = Modifier.size(24.dp)
                                         ) {
                                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                                 Text(
                                                     text = "${index + 1}",
-                                                    color = Color.White,
+                                                    color = MaterialTheme.colorScheme.onPrimary,
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 12.sp
                                                 )
@@ -304,7 +308,7 @@ fun UserRecipeDetailScreen(
                                         Text(
                                             text = instruction,
                                             fontSize = 15.sp,
-                                            color = Color.DarkGray,
+                                            color = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.weight(1f)
                                         )
                                     }
