@@ -1,6 +1,7 @@
 # ReciPick
 
-[![Version](https://img.shields.io/badge/Version-2.0-orange.svg)](https://github.com/Aayush049/recipick)
+[![Version](https://img.shields.io/badge/Version-2.0-orange.svg)](https://github.com/Aayush049/recipick/releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-ReciPick%20v2.0%20APK-success?logo=android)](https://github.com/Aayush049/recipick/releases/latest/download/ReciPick-v2.0.apk)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-brightgreen.svg)](https://developer.android.com/topic/architecture)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg)](https://kotlinlang.org/)
@@ -12,6 +13,20 @@ A modern recipe discovery and meal preparation application built with Jetpack Co
 
 ---
 
+## Download & Installation
+
+You can download the pre-compiled, installable release APK:
+
+- 📲 **[Download ReciPick v2.0 Release APK](https://github.com/Aayush049/recipick/releases/latest/download/ReciPick-v2.0.apk)**
+
+### Installing on Android
+1. Download `ReciPick-v2.0.apk` onto your Android phone or tablet (Android 9.0 / API 28 or newer).
+2. Open the file from your Downloads or file manager.
+3. If prompted by Android, permit **Install unknown apps** for your browser or file manager.
+4. Tap **Install** and enjoy cooking with ReciPick!
+
+---
+
 ## Overview
 
 ReciPick is a native Android application designed to help users discover, browse, author, and prepare a wide range of culinary recipes. Built adhering strictly to the **Clean Architecture** pattern, the codebase enforces clear boundaries, separation of concerns, and maintainable data flow across presentation, domain, and data layers.
@@ -20,7 +35,7 @@ ReciPick is a native Android application designed to help users discover, browse
 
 ## Version 2.0 (Current Release)
 
-Version 2.0 introduces offline-first local storage, user recipe creation, dynamic theme switching, and multi-color culinary palettes:
+Version 2.0 introduces offline-first local storage, user recipe creation, a unified signature theme engine, and polished Material 3 navigation:
 
 ### Shipped Features
 
@@ -34,18 +49,15 @@ Version 2.0 introduces offline-first local storage, user recipe creation, dynami
 - **"My Recipes" & Personal Detail View**:
   - Dedicated screen listing all user-authored local recipes in a responsive 2-column grid with empty states.
   - Interactive personal recipe detail view featuring hero imagery, metadata chips, interactive ingredient check-lists, numbered instruction steps, and delete confirmation dialogs.
-- **Dynamic Theme Engine & Multi-Color Palettes**:
+- **Unified Warm Orange Theme Engine**:
   - DataStore-backed theme preferences (`theme_preferences`).
-  - System, Light, and Dark appearance mode switching.
-  - 4 distinctive culinary color palettes:
-    * **Warm Orange** (Classic culinary orange #E64A19)
-    * **Herb & Mint** (Fresh basil #2E7D32)
-    * **Berry & Wine** (Rich plum #AD1457)
-    * **Saffron & Honey** (Golden amber #E65100)
+  - Seamless System, Light, and Dark appearance mode switching.
+  - Signature culinary Warm Orange theme (`#E64A19`) designed with adaptive high-contrast color tokens for optimal legibility in both light and dark themes.
 - **Material 3 Bottom Navigation**:
   - Seamless tab navigation between **Explore** (Home), **My Recipes**, and **Settings**, hidden automatically on detail and creation screens.
+  - Active tab highlighting and intuitive backstack state restoration.
 - **Settings & Appearance Screen**:
-  - In-app appearance mode toggle and color palette selector with real-time UI updates.
+  - Intuitive vertical layout for appearance mode selection (System, Light, Dark).
   - Version 3.0 roadmap profile placeholder card prepared for future Firebase Auth integration.
 
 ---
@@ -125,7 +137,7 @@ app/src/main/java/com/aayush/recipick/
 │   ├── local/                            # Room DB, DAOs, entities, converters, and mappers
 │   └── repository/                       # Concrete repository implementations
 │
-└── ui/theme/                             # 4 culinary color schemes, typography, and MaterialTheme
+└── ui/theme/                             # Warm Orange signature theme, adaptive color schemes, and MaterialTheme
 ```
 
 ---
