@@ -1,17 +1,18 @@
 package com.aayush.recipick.presentation.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aayush.recipick.data.remote.KtorClient
 import com.aayush.recipick.data.remote.RecipeAPIService
-import com.aayush.recipick.data.remote.dto.Recipe
 import com.aayush.recipick.data.repository.RecipeRepositoryImplementation
 import com.aayush.recipick.domain.repository.RecipeRepository
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -24,49 +25,42 @@ class RecipeDetailsViewModel(
     )
 ) : ViewModel() {
 
-    var isLoading by mutableStateOf(false)
-        private set
-
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
-
-    var recipe by mutableStateOf<Recipe?>(null)
-        private set
+    private val _uiState = MutableStateFlow<RecipeDetailUiState>(RecipeDetailUiState.Loading)
+    val uiState: StateFlow<RecipeDetailUiState> = _uiState.asStateFlow()
 
     fun fetchRecipeDetails(recipeId: Int) {
-        isLoading = true
-        errorMessage = null
+        _uiState.value = RecipeDetailUiState.Loading
 
         viewModelScope.launch {
             try {
-                recipe = repository.getRecipeByID(recipeId)
+                val recipe = repository.getRecipeByID(recipeId)
+                _uiState.value = RecipeDetailUiState.Success(recipe)
             } catch (e: Exception) {
-                errorMessage = mapErrorMessage(e)
-            } finally {
-                isLoading = false
+                if (e is CancellationException) throw e
+                _uiState.value = mapErrorToUiState(e)
             }
         }
     }
 
-    private fun mapErrorMessage(e: Exception): String {
+    private fun mapErrorToUiState(e: Exception): RecipeDetailUiState.Error {
         return when (e) {
             is UnknownHostException,
             is ConnectException,
             is UnresolvedAddressException -> {
-                "No internet connection. Please check your network and try again."
+                RecipeDetailUiState.Error.Retryable("No internet connection. Please check your network and try again.")
             }
             is HttpRequestTimeoutException,
             is SocketTimeoutException -> {
-                "Connection timed out. The server took too long to respond."
+                RecipeDetailUiState.Error.Retryable("Connection timed out. The server took too long to respond.")
             }
             is ClientRequestException -> {
-                if (e.response.status.value == 404) {
-                    "Recipe not found."
+                if (e.response.status == HttpStatusCode.NotFound) {
+                    RecipeDetailUiState.Error.NonRetryable("Recipe not found.")
                 } else {
-                    "Request failed (${e.response.status.value}). Please try again."
+                    RecipeDetailUiState.Error.Retryable("Request failed (${e.response.status.value}). Please try again.")
                 }
             }
-            else -> e.message ?: "An unexpected error occurred. Please try again."
+            else -> RecipeDetailUiState.Error.Retryable(e.message ?: "An unexpected error occurred. Please try again.")
         }
     }
 }

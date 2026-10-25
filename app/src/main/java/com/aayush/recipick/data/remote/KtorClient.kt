@@ -10,10 +10,11 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object KtorClient {
-    val client = HttpClient(Android){
-        install(ContentNegotiation){
+    val client = HttpClient(Android) {
+        expectSuccess = true
+        install(ContentNegotiation) {
             json(
-                Json{
+                Json {
                     ignoreUnknownKeys = true
                 }
             )

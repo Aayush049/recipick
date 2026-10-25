@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 fun ErrorMessage(
     errorMessage: String?,
     onRetry: () -> Unit,
+    buttonText: String = "Retry",
 ) {
     Column(
         modifier = Modifier
@@ -51,7 +52,7 @@ fun ErrorMessage(
                 )
             ) {
                 Text(
-                    text = "Retry",
+                    text = buttonText,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
