@@ -10,12 +10,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aayush.recipick.presentation.components.ErrorMessage
 import com.aayush.recipick.presentation.components.LoadingIndicator
 import com.aayush.recipick.presentation.components.MyTopAppBar
+import com.aayush.recipick.presentation.viewmodels.RecipeDetailUiState
 import com.aayush.recipick.presentation.viewmodels.RecipeDetailsViewModel
 
 @Composable
@@ -24,6 +27,8 @@ fun RecipeDetailScreen(
     onBack: () -> Unit,
     viewModel: RecipeDetailsViewModel = viewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     LaunchedEffect(recipeId) {
         viewModel.fetchRecipeDetails(recipeId)
     }
@@ -36,23 +41,36 @@ fun RecipeDetailScreen(
                 icon = Icons.AutoMirrored.Filled.ArrowBack
             )
         }
-    ){ innerPadding ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
-            when {
-                viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
+            when (val state = uiState) {
+                is RecipeDetailUiState.Loading -> {
+                    LoadingIndicator(strokeWidth = 1.dp)
+                }
 
-                viewModel.errorMessage != null -> ErrorMessage(
-                    errorMessage = viewModel.errorMessage,
-                    onRetry = { viewModel.fetchRecipeDetails(recipeId) }
-                )
+                is RecipeDetailUiState.Success -> {
+                    RecipeDetailContent(recipeDetails = state.recipe)
+                }
 
-                viewModel.recipe != null -> {
-                    RecipeDetailContent(recipeDetails = viewModel.recipe!!)
+                is RecipeDetailUiState.Error.Retryable -> {
+                    ErrorMessage(
+                        errorMessage = state.message,
+                        buttonText = "Retry",
+                        onRetry = { viewModel.fetchRecipeDetails(recipeId) }
+                    )
+                }
+
+                is RecipeDetailUiState.Error.NonRetryable -> {
+                    ErrorMessage(
+                        errorMessage = state.message,
+                        buttonText = "Back to Recipes",
+                        onRetry = onBack
+                    )
                 }
             }
         }

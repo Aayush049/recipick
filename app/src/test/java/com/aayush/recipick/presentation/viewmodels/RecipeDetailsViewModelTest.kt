@@ -2,6 +2,16 @@ package com.aayush.recipick.presentation.viewmodels
 
 import com.aayush.recipick.data.remote.dto.Recipe
 import com.aayush.recipick.domain.repository.RecipeRepository
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.request.get
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -11,9 +21,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -48,7 +55,7 @@ class RecipeDetailsViewModelTest {
     }
 
     @Test
-    fun fetchRecipeDetails_success_updatesRecipeAndClearsLoading() = runTest {
+    fun fetchRecipeDetails_success_updatesRecipeAndEmitsSuccessState() = runTest {
         val sampleRecipe = Recipe(
             id = 1,
             name = "Classic Margherita Pizza",
@@ -71,39 +78,75 @@ class RecipeDetailsViewModelTest {
         val viewModel = RecipeDetailsViewModel(repository = repo)
 
         viewModel.fetchRecipeDetails(1)
-        assertTrue(viewModel.isLoading)
+        assertTrue(viewModel.uiState.value is RecipeDetailUiState.Loading)
 
         advanceUntilIdle()
 
-        assertFalse(viewModel.isLoading)
-        assertNull(viewModel.errorMessage)
-        assertNotNull(viewModel.recipe)
-        assertEquals("Classic Margherita Pizza", viewModel.recipe?.name)
+        val state = viewModel.uiState.value
+        assertTrue(state is RecipeDetailUiState.Success)
+        assertEquals("Classic Margherita Pizza", (state as RecipeDetailUiState.Success).recipe.name)
     }
 
     @Test
-    fun fetchRecipeDetails_noInternet_setsFriendlyErrorMessage() = runTest {
+    fun fetchRecipeDetails_noInternet_emitsRetryableError() = runTest {
         val repo = FakeRecipeRepository(exceptionToThrow = UnknownHostException("Unable to resolve host"))
         val viewModel = RecipeDetailsViewModel(repository = repo)
 
         viewModel.fetchRecipeDetails(1)
         advanceUntilIdle()
 
-        assertFalse(viewModel.isLoading)
-        assertNull(viewModel.recipe)
-        assertEquals("No internet connection. Please check your network and try again.", viewModel.errorMessage)
+        val state = viewModel.uiState.value
+        assertTrue(state is RecipeDetailUiState.Error.Retryable)
+        assertEquals(
+            "No internet connection. Please check your network and try again.",
+            (state as RecipeDetailUiState.Error.Retryable).message
+        )
     }
 
     @Test
-    fun fetchRecipeDetails_timeout_setsTimeoutErrorMessage() = runTest {
+    fun fetchRecipeDetails_timeout_emitsRetryableError() = runTest {
         val repo = FakeRecipeRepository(exceptionToThrow = SocketTimeoutException("connect timed out"))
         val viewModel = RecipeDetailsViewModel(repository = repo)
 
         viewModel.fetchRecipeDetails(1)
         advanceUntilIdle()
 
-        assertFalse(viewModel.isLoading)
-        assertNull(viewModel.recipe)
-        assertEquals("Connection timed out. The server took too long to respond.", viewModel.errorMessage)
+        val state = viewModel.uiState.value
+        assertTrue(state is RecipeDetailUiState.Error.Retryable)
+        assertEquals(
+            "Connection timed out. The server took too long to respond.",
+            (state as RecipeDetailUiState.Error.Retryable).message
+        )
+    }
+
+    @Test
+    fun fetchRecipeDetails_notFound404_emitsNonRetryableError() = runTest {
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = ByteReadChannel("""{"message": "Recipe not found"}"""),
+                status = HttpStatusCode.NotFound,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val client = HttpClient(mockEngine) { expectSuccess = true }
+        var notFoundException: ClientRequestException? = null
+        try {
+            client.get("https://dummyjson.com/recipes/9999").body<String>()
+        } catch (e: ClientRequestException) {
+            notFoundException = e
+        }
+
+        val repo = FakeRecipeRepository(exceptionToThrow = notFoundException!!)
+        val viewModel = RecipeDetailsViewModel(repository = repo)
+
+        viewModel.fetchRecipeDetails(9999)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is RecipeDetailUiState.Error.NonRetryable)
+        assertEquals(
+            "Recipe not found.",
+            (state as RecipeDetailUiState.Error.NonRetryable).message
+        )
     }
 }

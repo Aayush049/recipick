@@ -22,14 +22,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aayush.recipick.presentation.components.ErrorMessage
 import com.aayush.recipick.presentation.components.LoadingIndicator
+import com.aayush.recipick.presentation.viewmodels.HomeUiState
 import com.aayush.recipick.presentation.viewmodels.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +42,8 @@ fun HomeScreen(
     onAddRecipeClick: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,21 +74,24 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when {
-                viewModel.isLoading -> LoadingIndicator(strokeWidth = 1.dp)
+            when (val state = uiState) {
+                is HomeUiState.Loading -> {
+                    LoadingIndicator(strokeWidth = 1.dp)
+                }
 
-                viewModel.errorMessage != null -> ErrorMessage(
-                    errorMessage = viewModel.errorMessage,
-                    onRetry = { viewModel.fetchRecipes() }
-                )
+                is HomeUiState.Error -> {
+                    ErrorMessage(
+                        errorMessage = state.message,
+                        onRetry = { viewModel.fetchRecipes() }
+                    )
+                }
 
-                else -> {
+                is HomeUiState.Success -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         contentPadding = PaddingValues(
@@ -99,11 +107,11 @@ fun HomeScreen(
                             HomeHeader()
                         }
 
-                        if (viewModel.categories.size > 1) {
+                        if (state.categories.size > 1) {
                             item(span = { GridItemSpan(maxLineSpan) }) {
                                 CategorySection(
-                                    categories = viewModel.categories,
-                                    selectedCategory = viewModel.selectedCategory,
+                                    categories = state.categories,
+                                    selectedCategory = state.selectedCategory,
                                     onCategorySelected = viewModel::onCategorySelected
                                 )
                             }
@@ -111,12 +119,12 @@ fun HomeScreen(
 
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CategorySectionHeader(
-                                title = if (viewModel.selectedCategory == "All") "All Recipes" else viewModel.selectedCategory,
+                                title = if (state.selectedCategory == "All") "All Recipes" else state.selectedCategory,
                                 icon = Icons.AutoMirrored.Filled.MenuOpen
                             )
                         }
 
-                        if (viewModel.recipes.isEmpty()) {
+                        if (state.recipes.isEmpty()) {
                             item(span = { GridItemSpan(maxLineSpan) }) {
                                 Box(
                                     modifier = Modifier
@@ -133,7 +141,7 @@ fun HomeScreen(
                                 }
                             }
                         } else {
-                            items(viewModel.recipes, key = { it.id }) { recipe ->
+                            items(state.recipes, key = { it.id }) { recipe ->
                                 RecipeCard(
                                     recipe = recipe,
                                     onClickk = { onRecipeClick(recipe.id) }
