@@ -2,6 +2,8 @@ package com.aayush.recipick.presentation.screens.add_recipe
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -10,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -25,6 +28,13 @@ fun DynamicListSection(
     modifier: Modifier = Modifier
 ) {
     var textInput by remember { mutableStateOf("") }
+
+    val handleAdd = {
+        if (textInput.isNotBlank()) {
+            onAddItem(textInput.trim())
+            textInput = ""
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -47,16 +57,13 @@ fun DynamicListSection(
                 onValueChange = { textInput = it },
                 placeholder = { Text(placeholder, fontSize = 14.sp) },
                 modifier = Modifier.weight(1f),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { handleAdd() })
             )
 
             IconButton(
-                onClick = {
-                    if (textInput.isNotBlank()) {
-                        onAddItem(textInput.trim())
-                        textInput = ""
-                    }
-                },
+                onClick = handleAdd,
                 modifier = Modifier.size(48.dp),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
