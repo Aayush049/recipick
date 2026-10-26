@@ -28,7 +28,7 @@ import com.aayush.recipick.domain.repository.UserRecipeRepository
 import com.aayush.recipick.presentation.screens.recipe_detail.InfoChip
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun UserRecipeDetailScreen(
     recipeId: Int,
@@ -205,20 +205,15 @@ fun UserRecipeDetailScreen(
                                 }
                             }
 
-                            // Metadata Chips
-                            Row(
+                            // Metadata Chips (Flexible FlowRow preventing text wrapping and oversized chips)
+                            FlowRow(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 InfoChip(label = "Prep: ${currentRecipe.prepTimeMinutes}m", icon = Icons.Default.Timer)
                                 InfoChip(label = "Cook: ${currentRecipe.cookTimeMinutes}m", icon = Icons.Default.OutdoorGrill)
                                 InfoChip(label = "Servings: ${currentRecipe.servings}", icon = Icons.Default.People)
-                            }
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
                                 InfoChip(label = "Cuisine: ${currentRecipe.cuisine}", icon = Icons.Default.RestaurantMenu)
                                 InfoChip(label = "Difficulty: ${currentRecipe.difficulty}", icon = Icons.Default.Speed)
                                 if (currentRecipe.caloriesPerServing > 0) {

@@ -22,17 +22,18 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun InfoChip(
     label: String,
-    icon: ImageVector
+    icon: ImageVector,
+    modifier: Modifier = Modifier
 ) {
-    if (label.isBlank()){
+    if (label.isBlank()) {
         return
     }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clip(shape = RoundedCornerShape(20.dp))
             .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -48,7 +49,9 @@ fun InfoChip(
             text = label,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
