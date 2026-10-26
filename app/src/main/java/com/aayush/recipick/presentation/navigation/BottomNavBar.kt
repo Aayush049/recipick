@@ -30,6 +30,16 @@ sealed class BottomNavItem(
     object Settings : BottomNavItem(SettingsRoute, "Settings", Icons.Default.Settings, "SettingsRoute")
 }
 
+fun NavHostController.navigateToTopLevelDestination(route: Any) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = (route != HomeRoute)
+    }
+}
+
 @Composable
 fun BottomNavBar(
     navController: NavHostController,
@@ -75,13 +85,7 @@ fun BottomNavBar(
                 ),
                 onClick = {
                     if (!selected) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        navController.navigateToTopLevelDestination(item.route)
                     }
                 }
             )

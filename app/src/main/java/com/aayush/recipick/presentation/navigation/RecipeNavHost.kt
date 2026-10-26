@@ -80,7 +80,7 @@ fun RecipeNavHost() {
                         navController.navigate(AddRecipeRoute)
                     },
                     onSettingsClick = {
-                        navController.navigate(SettingsRoute)
+                        navController.navigateToTopLevelDestination(SettingsRoute)
                     },
                     isLoggedIn = currentUser != null
                 )
@@ -118,7 +118,7 @@ fun RecipeNavHost() {
                         navController.navigate(UserRecipeDetailRoute(recipeId))
                     },
                     onSettingsClick = {
-                        navController.navigate(SettingsRoute)
+                        navController.navigateToTopLevelDestination(SettingsRoute)
                     },
                     viewModel = myRecipesViewModel,
                     authViewModel = authViewModel

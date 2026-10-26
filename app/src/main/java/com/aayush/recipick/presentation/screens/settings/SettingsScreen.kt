@@ -96,19 +96,10 @@ fun SettingsScreen(
             // ── 1. User Profile Card ─────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (currentUser != null)
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
-                    else
-                        MaterialTheme.colorScheme.surfaceVariant
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(
-                    1.dp,
-                    if (currentUser != null) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                    else MaterialTheme.colorScheme.outlineVariant
-                )
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Column(
                     modifier = Modifier
@@ -123,19 +114,26 @@ fun SettingsScreen(
                     ) {
                         // User Avatar
                         if (currentUser?.photoUrl != null) {
-                            AsyncImage(
-                                model = currentUser?.photoUrl,
-                                contentDescription = "Profile Photo",
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
+                            Surface(
+                                modifier = Modifier.size(58.dp),
+                                shape = CircleShape,
+                                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                            ) {
+                                AsyncImage(
+                                    model = currentUser?.photoUrl,
+                                    contentDescription = "Profile Photo",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         } else {
                             Surface(
-                                modifier = Modifier.size(56.dp),
+                                modifier = Modifier.size(58.dp),
                                 shape = CircleShape,
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
@@ -153,12 +151,31 @@ fun SettingsScreen(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text(
-                                text = currentUser?.displayName ?: (if (currentUser != null) "ReciPick Chef" else "Guest User"),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = currentUser?.displayName ?: (if (currentUser != null) "ReciPick Chef" else "Guest User"),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                if (currentUser != null) {
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text(
+                                            text = "Chef",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+                            }
                             Text(
                                 text = currentUser?.email ?: "Sign in to sync recipes across devices",
                                 fontSize = 13.sp,
@@ -173,8 +190,10 @@ fun SettingsScreen(
                     if (currentUser == null) {
                         Button(
                             onClick = { showAuthBottomSheet = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(10.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Login,
@@ -187,18 +206,24 @@ fun SettingsScreen(
                     } else {
                         OutlinedButton(
                             onClick = { showSignOutDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(46.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.05f),
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f))
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Logout,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Sign Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                            Text("Sign Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                 }
