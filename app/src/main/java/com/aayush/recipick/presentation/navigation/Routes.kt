@@ -18,4 +18,7 @@ object MyRecipesRoute
 data class UserRecipeDetailRoute(val recipeId: Int)
 
 @Serializable
+object PlannerRoute
+
+@Serializable
 object SettingsRoute
