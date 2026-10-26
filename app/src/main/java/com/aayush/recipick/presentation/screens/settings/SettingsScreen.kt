@@ -201,7 +201,7 @@ fun SettingsScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Sign In / Register with Google & Email", fontWeight = FontWeight.Bold)
+                            Text(text = "Sign In / Register", fontWeight = FontWeight.Bold)
                         }
                     } else {
                         OutlinedButton(
