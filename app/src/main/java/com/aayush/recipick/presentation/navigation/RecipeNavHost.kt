@@ -16,14 +16,20 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.aayush.recipick.ReciPickApp
+import com.aayush.recipick.data.remote.KtorClient
+import com.aayush.recipick.data.remote.RecipeAPIService
+import com.aayush.recipick.data.repository.RecipeRepositoryImplementation
 import com.aayush.recipick.presentation.screens.add_recipe.AddRecipeScreen
 import com.aayush.recipick.presentation.screens.home.HomeScreen
 import com.aayush.recipick.presentation.screens.my_recipes.MyRecipesScreen
+import com.aayush.recipick.presentation.screens.planner.PlannerScreen
 import com.aayush.recipick.presentation.screens.recipe_detail.RecipeDetailScreen
 import com.aayush.recipick.presentation.screens.settings.SettingsScreen
 import com.aayush.recipick.presentation.screens.user_recipe_detail.UserRecipeDetailScreen
 import com.aayush.recipick.presentation.viewmodels.AddRecipeViewModel
 import com.aayush.recipick.presentation.viewmodels.AuthViewModel
+import com.aayush.recipick.presentation.viewmodels.GroceryViewModel
+import com.aayush.recipick.presentation.viewmodels.MealPlanViewModel
 import com.aayush.recipick.presentation.viewmodels.MyRecipesViewModel
 import com.aayush.recipick.presentation.viewmodels.ThemeViewModel
 
@@ -50,7 +56,7 @@ fun RecipeNavHost() {
 
     // Determine whether to show bottom bar (only on top-level destinations)
     val showBottomBar = currentRoute?.route?.let { route ->
-        route.contains("HomeRoute") || route.contains("MyRecipesRoute") || route.contains("SettingsRoute")
+        route.contains("HomeRoute") || route.contains("MyRecipesRoute") || route.contains("PlannerRoute") || route.contains("SettingsRoute")
     } ?: true
 
     Scaffold(
@@ -131,6 +137,34 @@ fun RecipeNavHost() {
                     recipeId = detailRoute.recipeId,
                     onBack = { navController.popBackStack() },
                     repository = app.userRecipeRepository
+                )
+            }
+
+            composable<PlannerRoute> {
+                val mealPlanViewModel: MealPlanViewModel = viewModel(
+                    factory = MealPlanViewModel.provideFactory(
+                        mealPlanRepository = app.mealPlanRepository,
+                        groceryRepository = app.groceryRepository
+                    )
+                )
+                val groceryViewModel: GroceryViewModel = viewModel(
+                    factory = GroceryViewModel.provideFactory(app.groceryRepository)
+                )
+                val recipeRepository = RecipeRepositoryImplementation(
+                    apiService = RecipeAPIService(client = KtorClient.client)
+                )
+
+                PlannerScreen(
+                    mealPlanViewModel = mealPlanViewModel,
+                    groceryViewModel = groceryViewModel,
+                    userRecipeRepository = app.userRecipeRepository,
+                    recipeRepository = recipeRepository,
+                    onNavigateToRecipeDetail = { recipeId ->
+                        navController.navigate(RecipeDetailsRoute(recipeId))
+                    },
+                    onNavigateToUserRecipeDetail = { recipeId ->
+                        navController.navigate(UserRecipeDetailRoute(recipeId))
+                    }
                 )
             }
 

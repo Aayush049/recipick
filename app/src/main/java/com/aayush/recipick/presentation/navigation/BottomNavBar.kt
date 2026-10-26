@@ -2,6 +2,7 @@ package com.aayush.recipick.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ sealed class BottomNavItem(
 ) {
     object Home : BottomNavItem(HomeRoute, "Explore", Icons.Default.Explore, "HomeRoute")
     object MyRecipes : BottomNavItem(MyRecipesRoute, "My Recipes", Icons.AutoMirrored.Filled.MenuBook, "MyRecipesRoute")
+    object Planner : BottomNavItem(PlannerRoute, "Planner", Icons.Default.CalendarMonth, "PlannerRoute")
     object Settings : BottomNavItem(SettingsRoute, "Settings", Icons.Default.Settings, "SettingsRoute")
 }
 
@@ -48,6 +50,7 @@ fun BottomNavBar(
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.MyRecipes,
+        BottomNavItem.Planner,
         BottomNavItem.Settings
     )
 
