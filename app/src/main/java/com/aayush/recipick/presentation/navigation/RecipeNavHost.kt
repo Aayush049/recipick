@@ -22,6 +22,7 @@ import com.aayush.recipick.presentation.screens.recipe_detail.RecipeDetailScreen
 import com.aayush.recipick.presentation.screens.settings.SettingsScreen
 import com.aayush.recipick.presentation.screens.user_recipe_detail.UserRecipeDetailScreen
 import com.aayush.recipick.presentation.viewmodels.AddRecipeViewModel
+import com.aayush.recipick.presentation.viewmodels.AuthViewModel
 import com.aayush.recipick.presentation.viewmodels.MyRecipesViewModel
 import com.aayush.recipick.presentation.viewmodels.ThemeViewModel
 
@@ -83,7 +84,10 @@ fun RecipeNavHost() {
 
             composable<AddRecipeRoute> {
                 val addRecipeViewModel: AddRecipeViewModel = viewModel(
-                    factory = AddRecipeViewModel.provideFactory(app.userRecipeRepository)
+                    factory = AddRecipeViewModel.provideFactory(
+                        repository = app.userRecipeRepository,
+                        syncRepository = app.syncRepository
+                    )
                 )
                 AddRecipeScreen(
                     onBack = { navController.popBackStack() },
@@ -114,7 +118,16 @@ fun RecipeNavHost() {
             }
 
             composable<SettingsRoute> {
-                SettingsScreen(themeViewModel = themeViewModel)
+                val authViewModel: AuthViewModel = viewModel(
+                    factory = AuthViewModel.provideFactory(
+                        authRepository = app.authRepository,
+                        syncRepository = app.syncRepository
+                    )
+                )
+                SettingsScreen(
+                    themeViewModel = themeViewModel,
+                    authViewModel = authViewModel
+                )
             }
         }
     }
