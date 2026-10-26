@@ -151,7 +151,7 @@ fun PlannerScreen(
                         }
                     },
                     icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
-                    text = { Text("Generate Grocery List") },
+                    text = { Text("Generate List") },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )

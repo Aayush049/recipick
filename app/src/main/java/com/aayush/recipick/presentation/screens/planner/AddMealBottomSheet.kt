@@ -129,7 +129,7 @@ fun AddMealBottomSheet(
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    text = { Text("Custom Note") },
+                    text = { Text("Custom") },
                     icon = { Icon(Icons.Default.EditNote, contentDescription = null, modifier = Modifier.size(18.dp)) }
                 )
             }
