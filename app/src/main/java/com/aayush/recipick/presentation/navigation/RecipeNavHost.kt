@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +36,14 @@ fun RecipeNavHost() {
     val themeViewModel: ThemeViewModel = viewModel(
         factory = ThemeViewModel.provideFactory(app.themePreferencesRepository)
     )
+
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModel.provideFactory(
+            authRepository = app.authRepository,
+            syncRepository = app.syncRepository
+        )
+    )
+    val currentUser by authViewModel.currentUser.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
@@ -69,7 +78,11 @@ fun RecipeNavHost() {
                     },
                     onAddRecipeClick = {
                         navController.navigate(AddRecipeRoute)
-                    }
+                    },
+                    onSettingsClick = {
+                        navController.navigate(SettingsRoute)
+                    },
+                    isLoggedIn = currentUser != null
                 )
             }
 
@@ -104,7 +117,11 @@ fun RecipeNavHost() {
                     onRecipeClick = { recipeId ->
                         navController.navigate(UserRecipeDetailRoute(recipeId))
                     },
-                    viewModel = myRecipesViewModel
+                    onSettingsClick = {
+                        navController.navigate(SettingsRoute)
+                    },
+                    viewModel = myRecipesViewModel,
+                    authViewModel = authViewModel
                 )
             }
 
@@ -118,12 +135,6 @@ fun RecipeNavHost() {
             }
 
             composable<SettingsRoute> {
-                val authViewModel: AuthViewModel = viewModel(
-                    factory = AuthViewModel.provideFactory(
-                        authRepository = app.authRepository,
-                        syncRepository = app.syncRepository
-                    )
-                )
                 SettingsScreen(
                     themeViewModel = themeViewModel,
                     authViewModel = authViewModel

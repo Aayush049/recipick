@@ -1,7 +1,6 @@
 package com.aayush.recipick.presentation.screens.settings
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,11 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.CloudOff
-import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.aayush.recipick.domain.model.SyncStatus
 import com.aayush.recipick.domain.model.ThemeMode
 import com.aayush.recipick.presentation.screens.auth.AuthBottomSheet
 import com.aayush.recipick.presentation.viewmodels.AuthViewModel
@@ -40,7 +34,6 @@ fun SettingsScreen(
 ) {
     val themeConfig by themeViewModel.themeConfig.collectAsState()
     val currentUser by authViewModel.currentUser.collectAsState()
-    val syncStatus by authViewModel.syncStatus.collectAsState()
     val scrollState = rememberScrollState()
 
     var showAuthBottomSheet by remember { mutableStateOf(false) }
@@ -100,7 +93,7 @@ fun SettingsScreen(
                 .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ── 1. User Profile & Cloud Sync Card ────────────────────────────
+            // ── 1. User Profile Card ─────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -160,31 +153,14 @@ fun SettingsScreen(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = currentUser?.displayName ?: (if (currentUser != null) "ReciPick Chef" else "Guest User"),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Surface(
-                                    color = if (currentUser != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Text(
-                                        text = if (currentUser != null) "Cloud Synced" else "Offline",
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                    )
-                                }
-                            }
                             Text(
-                                text = currentUser?.email ?: "Sign in to back up recipes to Cloud Firestore",
+                                text = currentUser?.displayName ?: (if (currentUser != null) "ReciPick Chef" else "Guest User"),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = currentUser?.email ?: "Sign in to sync recipes across devices",
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -193,7 +169,7 @@ fun SettingsScreen(
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-                    // Cloud Sync & Action Row
+                    // Action Button (Sign In or Sign Out)
                     if (currentUser == null) {
                         Button(
                             onClick = { showAuthBottomSheet = true },
@@ -209,110 +185,26 @@ fun SettingsScreen(
                             Text(text = "Sign In / Register with Google & Email", fontWeight = FontWeight.Bold)
                         }
                     } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            // Sync Status Banner
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                when (syncStatus) {
-                                    is SyncStatus.Syncing -> {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(16.dp),
-                                            strokeWidth = 2.dp,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                        Text(
-                                            text = "Syncing recipes with Cloud Firestore...",
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                    is SyncStatus.Success -> {
-                                        Icon(
-                                            imageVector = Icons.Default.CloudDone,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Text(
-                                            text = "All recipes backed up to Firestore",
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    is SyncStatus.Error -> {
-                                        Icon(
-                                            imageVector = Icons.Default.CloudOff,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Text(
-                                            text = "Sync error: ${(syncStatus as SyncStatus.Error).message}",
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.error
-                                        )
-                                    }
-                                    is SyncStatus.Idle -> {
-                                        Icon(
-                                            imageVector = Icons.Default.CloudSync,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Text(
-                                            text = "Cloud sync connected",
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-                            }
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                FilledTonalButton(
-                                    onClick = { authViewModel.syncNow() },
-                                    modifier = Modifier.weight(1f),
-                                    shape = RoundedCornerShape(10.dp),
-                                    enabled = syncStatus !is SyncStatus.Syncing
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Sync,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Sync Now")
-                                }
-
-                                OutlinedButton(
-                                    onClick = { showSignOutDialog = true },
-                                    modifier = Modifier.weight(1f),
-                                    shape = RoundedCornerShape(10.dp),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Sign Out", color = MaterialTheme.colorScheme.error)
-                                }
-                            }
+                        OutlinedButton(
+                            onClick = { showSignOutDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Sign Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
             }
 
-            // ── 2. Theme Mode Section (Arranged in Column) ───────────────────
+            // ── 2. Appearance Mode Section ──────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     text = "Appearance Mode",
