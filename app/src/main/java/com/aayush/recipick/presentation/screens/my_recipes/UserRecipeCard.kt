@@ -2,9 +2,10 @@ package com.aayush.recipick.presentation.screens.my_recipes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -155,7 +156,7 @@ fun UserRecipeCard(
                 }
             }
 
-            // Centered Delete Option revealed on long-press
+            // Centered Delete Icon revealed on long-press
             if (showDeleteOption) {
                 Box(
                     modifier = Modifier
@@ -164,27 +165,22 @@ fun UserRecipeCard(
                         .clickable { showDeleteOption = false },
                     contentAlignment = Alignment.Center
                 ) {
-                    FilledTonalButton(
+                    FilledIconButton(
                         onClick = {
                             showDeleteOption = false
                             showDeleteDialog = true
                         },
-                        colors = ButtonDefaults.filledTonalButtonColors(
+                        modifier = Modifier.size(52.dp),
+                        shape = CircleShape,
+                        colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Delete",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
+                            contentDescription = "Delete Recipe",
+                            modifier = Modifier.size(26.dp)
                         )
                     }
                 }
