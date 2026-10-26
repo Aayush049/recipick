@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.aayush.recipick.domain.model.UserRecipe
+import com.aayush.recipick.domain.repository.SyncRepository
 import com.aayush.recipick.domain.repository.UserRecipeRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,8 @@ data class AddRecipeUiState(
 
 class AddRecipeViewModel(
     private val repository: UserRecipeRepository,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val syncRepository: SyncRepository? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddRecipeUiState())
@@ -67,11 +69,18 @@ class AddRecipeViewModel(
         _uiState.update { it.copy(caloriesPerServing = calories) }
     }
 
-    fun addIngredient(item: String) {
-        if (item.isNotBlank()) {
-            _uiState.update { state ->
-                state.copy(
-                    ingredients = state.ingredients + item.trim(),
+    fun setImageUri(uri: String?) {
+        _uiState.update { it.copy(imageUri = uri) }
+    }
+
+    fun updateImageUri(uri: String?) = setImageUri(uri)
+
+    fun addIngredient(ingredient: String) {
+        val trimmed = ingredient.trim()
+        if (trimmed.isNotEmpty()) {
+            _uiState.update {
+                it.copy(
+                    ingredients = it.ingredients + trimmed,
                     ingredientsError = null
                 )
             }
@@ -79,20 +88,21 @@ class AddRecipeViewModel(
     }
 
     fun removeIngredient(index: Int) {
-        _uiState.update { state ->
-            val list = state.ingredients.toMutableList()
-            if (index in list.indices) {
-                list.removeAt(index)
+        _uiState.update {
+            val updated = it.ingredients.toMutableList()
+            if (index in updated.indices) {
+                updated.removeAt(index)
             }
-            state.copy(ingredients = list)
+            it.copy(ingredients = updated)
         }
     }
 
-    fun addInstruction(step: String) {
-        if (step.isNotBlank()) {
-            _uiState.update { state ->
-                state.copy(
-                    instructions = state.instructions + step.trim(),
+    fun addInstruction(instruction: String) {
+        val trimmed = instruction.trim()
+        if (trimmed.isNotEmpty()) {
+            _uiState.update {
+                it.copy(
+                    instructions = it.instructions + trimmed,
                     instructionsError = null
                 )
             }
@@ -100,22 +110,18 @@ class AddRecipeViewModel(
     }
 
     fun removeInstruction(index: Int) {
-        _uiState.update { state ->
-            val list = state.instructions.toMutableList()
-            if (index in list.indices) {
-                list.removeAt(index)
+        _uiState.update {
+            val updated = it.instructions.toMutableList()
+            if (index in updated.indices) {
+                updated.removeAt(index)
             }
-            state.copy(instructions = list)
+            it.copy(instructions = updated)
         }
-    }
-
-    fun setImageUri(uri: String?) {
-        _uiState.update { it.copy(imageUri = uri) }
     }
 
     fun saveRecipe() {
         val currentState = _uiState.value
-        val nameErr = if (currentState.name.isBlank()) "Recipe name cannot be blank" else null
+        val nameErr = if (currentState.name.isBlank()) "Recipe title is required" else null
         val ingredientsErr = if (currentState.ingredients.isEmpty()) "Add at least one ingredient" else null
         val instructionsErr = if (currentState.instructions.isEmpty()) "Add at least one instruction step" else null
 
@@ -146,6 +152,7 @@ class AddRecipeViewModel(
                     imageUri = currentState.imageUri
                 )
                 repository.insertUserRecipe(recipe)
+                runCatching { syncRepository?.syncRecipes() }
                 _uiState.update { it.copy(isSaving = false, isSaved = true) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isSaving = false) }
@@ -154,11 +161,17 @@ class AddRecipeViewModel(
     }
 
     companion object {
-        fun provideFactory(repository: UserRecipeRepository): ViewModelProvider.Factory =
+        fun provideFactory(
+            repository: UserRecipeRepository,
+            syncRepository: SyncRepository? = null
+        ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return AddRecipeViewModel(repository) as T
+                    return AddRecipeViewModel(
+                        repository = repository,
+                        syncRepository = syncRepository
+                    ) as T
                 }
             }
     }

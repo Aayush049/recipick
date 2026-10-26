@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +23,7 @@ import com.aayush.recipick.presentation.screens.recipe_detail.RecipeDetailScreen
 import com.aayush.recipick.presentation.screens.settings.SettingsScreen
 import com.aayush.recipick.presentation.screens.user_recipe_detail.UserRecipeDetailScreen
 import com.aayush.recipick.presentation.viewmodels.AddRecipeViewModel
+import com.aayush.recipick.presentation.viewmodels.AuthViewModel
 import com.aayush.recipick.presentation.viewmodels.MyRecipesViewModel
 import com.aayush.recipick.presentation.viewmodels.ThemeViewModel
 
@@ -34,6 +36,14 @@ fun RecipeNavHost() {
     val themeViewModel: ThemeViewModel = viewModel(
         factory = ThemeViewModel.provideFactory(app.themePreferencesRepository)
     )
+
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModel.provideFactory(
+            authRepository = app.authRepository,
+            syncRepository = app.syncRepository
+        )
+    )
+    val currentUser by authViewModel.currentUser.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
@@ -68,7 +78,11 @@ fun RecipeNavHost() {
                     },
                     onAddRecipeClick = {
                         navController.navigate(AddRecipeRoute)
-                    }
+                    },
+                    onSettingsClick = {
+                        navController.navigateToTopLevelDestination(SettingsRoute)
+                    },
+                    isLoggedIn = currentUser != null
                 )
             }
 
@@ -83,7 +97,10 @@ fun RecipeNavHost() {
 
             composable<AddRecipeRoute> {
                 val addRecipeViewModel: AddRecipeViewModel = viewModel(
-                    factory = AddRecipeViewModel.provideFactory(app.userRecipeRepository)
+                    factory = AddRecipeViewModel.provideFactory(
+                        repository = app.userRecipeRepository,
+                        syncRepository = app.syncRepository
+                    )
                 )
                 AddRecipeScreen(
                     onBack = { navController.popBackStack() },
@@ -100,7 +117,11 @@ fun RecipeNavHost() {
                     onRecipeClick = { recipeId ->
                         navController.navigate(UserRecipeDetailRoute(recipeId))
                     },
-                    viewModel = myRecipesViewModel
+                    onSettingsClick = {
+                        navController.navigateToTopLevelDestination(SettingsRoute)
+                    },
+                    viewModel = myRecipesViewModel,
+                    authViewModel = authViewModel
                 )
             }
 
@@ -114,7 +135,10 @@ fun RecipeNavHost() {
             }
 
             composable<SettingsRoute> {
-                SettingsScreen(themeViewModel = themeViewModel)
+                SettingsScreen(
+                    themeViewModel = themeViewModel,
+                    authViewModel = authViewModel
+                )
             }
         }
     }
