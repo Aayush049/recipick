@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.gms.services)
 }
 
 android {
@@ -15,8 +16,8 @@ android {
         applicationId = "com.aayush.recipick"
         minSdk = 28
         targetSdk = 37
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 3
+        versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,7 +48,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
     testImplementation("io.ktor:ktor-client-mock:3.6.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -85,4 +85,14 @@ dependencies {
 
     // DataStore Preferences
     implementation(libs.androidx.datastore.preferences)
+
+    // Firebase BoM & Services
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
+    // Android Credential Manager & Google ID
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.id)
 }
