@@ -34,6 +34,7 @@ class RecipeConvertersAndMapperTest {
     fun testEntityDomainMapping() {
         val domain = UserRecipe(
             id = 42,
+            userId = "test_user_123",
             name = "Pancakes",
             ingredients = listOf("Flour", "Milk"),
             instructions = listOf("Mix", "Cook"),
@@ -49,6 +50,7 @@ class RecipeConvertersAndMapperTest {
 
         val entity = domain.toEntity()
         assertEquals(domain.id, entity.id)
+        assertEquals(domain.userId, entity.userId)
         assertEquals(domain.name, entity.name)
         assertEquals(domain.ingredients, entity.ingredients)
         assertEquals(domain.instructions, entity.instructions)

@@ -10,6 +10,7 @@ import com.aayush.recipick.data.local.converters.RecipeTypeConverters
 data class UserRecipeEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String? = null,
     val name: String,
     val ingredients: List<String>,
     val instructions: List<String>,

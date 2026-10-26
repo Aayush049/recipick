@@ -6,6 +6,7 @@ import com.aayush.recipick.domain.model.UserRecipe
 fun UserRecipeEntity.toDomain(): UserRecipe {
     return UserRecipe(
         id = id,
+        userId = userId,
         name = name,
         ingredients = ingredients,
         instructions = instructions,
@@ -23,6 +24,7 @@ fun UserRecipeEntity.toDomain(): UserRecipe {
 fun UserRecipe.toEntity(): UserRecipeEntity {
     return UserRecipeEntity(
         id = id,
+        userId = userId,
         name = name,
         ingredients = ingredients,
         instructions = instructions,

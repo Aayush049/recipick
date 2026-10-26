@@ -14,16 +14,19 @@ import com.aayush.recipick.domain.repository.UserRecipeRepository
 class ReciPickApp : Application() {
     val database: ReciPickDatabase by lazy { ReciPickDatabase.getDatabase(this) }
 
+    val authRepository: AuthRepository by lazy {
+        AuthRepositoryImpl()
+    }
+
     val userRecipeRepository: UserRecipeRepository by lazy {
-        UserRecipeRepositoryImpl(database.userRecipeDao())
+        UserRecipeRepositoryImpl(
+            userRecipeDao = database.userRecipeDao(),
+            authRepository = authRepository
+        )
     }
 
     val themePreferencesRepository: ThemePreferencesRepository by lazy {
         ThemePreferencesRepositoryImpl(this)
-    }
-
-    val authRepository: AuthRepository by lazy {
-        AuthRepositoryImpl()
     }
 
     val syncRepository: SyncRepository by lazy {

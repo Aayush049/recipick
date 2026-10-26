@@ -28,6 +28,9 @@ class SyncRepositoryImpl(
         _syncStatus.value = SyncStatus.Syncing
 
         return runCatching {
+            // 0. Claim any unassigned guest recipes for the current user
+            userRecipeDao.claimGuestRecipes(user.uid)
+
             val userRecipesRef = firestore
                 .collection("users")
                 .document(user.uid)
@@ -37,8 +40,8 @@ class SyncRepositoryImpl(
             val cloudSnapshot = userRecipesRef.get().await()
             val cloudRecipesMap = cloudSnapshot.documents.associateBy { it.id }
 
-            // 2. Fetch local recipes
-            val localRecipes = userRecipeDao.getAllRecipesList()
+            // 2. Fetch local recipes for current user only
+            val localRecipes = userRecipeDao.getRecipesListByUser(user.uid)
             val localRecipesMap = localRecipes.associateBy { it.id.toString() }
 
             // 3. Upload local recipes that aren't in cloud or are newer
@@ -49,6 +52,7 @@ class SyncRepositoryImpl(
                 if (cloudDoc == null || local.createdAt >= cloudCreatedAt) {
                     val recipeData = hashMapOf(
                         "id" to local.id,
+                        "userId" to user.uid,
                         "name" to local.name,
                         "ingredients" to local.ingredients,
                         "instructions" to local.instructions,
@@ -71,6 +75,7 @@ class SyncRepositoryImpl(
                 if (!localRecipesMap.containsKey(docId)) {
                     val entity = UserRecipeEntity(
                         id = doc.getLong("id")?.toInt() ?: docId.toIntOrNull() ?: 0,
+                        userId = user.uid,
                         name = doc.getString("name").orEmpty(),
                         ingredients = (doc.get("ingredients") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList(),
                         instructions = (doc.get("instructions") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList(),
