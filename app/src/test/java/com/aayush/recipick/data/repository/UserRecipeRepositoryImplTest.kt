@@ -235,4 +235,44 @@ class UserRecipeRepositoryImplTest {
         assertEquals("Offline Bread", recipesA[0].name)
         assertEquals("account_a", recipesA[0].userId)
     }
+
+    @Test
+    fun `deleteUserRecipe removes recipe from local database`() = runTest {
+        val recipe = UserRecipe(
+            id = 10,
+            name = "Test Delete",
+            ingredients = listOf("Item"),
+            instructions = listOf("Step"),
+            prepTimeMinutes = 5,
+            cookTimeMinutes = 5,
+            servings = 1,
+            difficulty = "Easy",
+            cuisine = "Global"
+        )
+        repository.insertUserRecipe(recipe)
+        assertEquals(1, fakeDao.recipesFlow.value.size)
+
+        repository.deleteUserRecipe(recipe)
+        assertEquals(0, fakeDao.recipesFlow.value.size)
+    }
+
+    @Test
+    fun `deleteUserRecipeById removes recipe from local database by id`() = runTest {
+        val recipe = UserRecipe(
+            id = 20,
+            name = "Test Delete By Id",
+            ingredients = listOf("Item"),
+            instructions = listOf("Step"),
+            prepTimeMinutes = 5,
+            cookTimeMinutes = 5,
+            servings = 1,
+            difficulty = "Easy",
+            cuisine = "Global"
+        )
+        repository.insertUserRecipe(recipe)
+        assertEquals(1, fakeDao.recipesFlow.value.size)
+
+        repository.deleteUserRecipeById(20)
+        assertEquals(0, fakeDao.recipesFlow.value.size)
+    }
 }

@@ -6,14 +6,17 @@ import com.aayush.recipick.data.local.mapper.toEntity
 import com.aayush.recipick.domain.model.UserRecipe
 import com.aayush.recipick.domain.repository.AuthRepository
 import com.aayush.recipick.domain.repository.UserRecipeRepository
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
 class UserRecipeRepositoryImpl(
     private val userRecipeDao: UserRecipeDao,
-    private val authRepository: AuthRepository? = null
+    private val authRepository: AuthRepository? = null,
+    private val firestore: FirebaseFirestore? = null
 ) : UserRecipeRepository {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -59,9 +62,26 @@ class UserRecipeRepositoryImpl(
 
     override suspend fun deleteUserRecipe(recipe: UserRecipe) {
         userRecipeDao.deleteRecipe(recipe.toEntity())
+        deleteFromCloud(recipe.id, recipe.userId)
     }
 
     override suspend fun deleteUserRecipeById(id: Int) {
         userRecipeDao.deleteRecipeById(id)
+        deleteFromCloud(id, null)
+    }
+
+    private suspend fun deleteFromCloud(recipeId: Int, recipeUserId: String?) {
+        val currentUid = authRepository?.currentUser?.value?.uid ?: recipeUserId
+        val db = firestore
+        if (currentUid != null && db != null) {
+            runCatching {
+                db.collection("users")
+                    .document(currentUid)
+                    .collection("recipes")
+                    .document(recipeId.toString())
+                    .delete()
+                    .await()
+            }
+        }
     }
 }

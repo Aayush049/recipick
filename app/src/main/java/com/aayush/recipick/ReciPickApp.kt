@@ -10,6 +10,7 @@ import com.aayush.recipick.domain.repository.AuthRepository
 import com.aayush.recipick.domain.repository.SyncRepository
 import com.aayush.recipick.domain.repository.ThemePreferencesRepository
 import com.aayush.recipick.domain.repository.UserRecipeRepository
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ReciPickApp : Application() {
     val database: ReciPickDatabase by lazy { ReciPickDatabase.getDatabase(this) }
@@ -21,7 +22,8 @@ class ReciPickApp : Application() {
     val userRecipeRepository: UserRecipeRepository by lazy {
         UserRecipeRepositoryImpl(
             userRecipeDao = database.userRecipeDao(),
-            authRepository = authRepository
+            authRepository = authRepository,
+            firestore = FirebaseFirestore.getInstance()
         )
     }
 
