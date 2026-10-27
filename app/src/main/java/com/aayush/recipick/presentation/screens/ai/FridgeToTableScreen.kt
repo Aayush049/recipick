@@ -215,8 +215,8 @@ fun FridgeToTableScreen(
                             OutlinedTextField(
                                 value = ingredientInput,
                                 onValueChange = { ingredientInput = it },
-                                placeholder = { Text("e.g. Chicken breast, Garlic, Cream") },
-                                singleLine = true,
+                                placeholder = { Text("e.g. Chicken, Garlic, Cream") },
+                                maxLines = 1,
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

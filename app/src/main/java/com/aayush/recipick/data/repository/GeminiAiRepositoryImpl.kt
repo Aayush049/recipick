@@ -28,7 +28,7 @@ class GeminiAiRepositoryImpl(
         }
 
         val generativeModel = GenerativeModel(
-            modelName = "gemini-1.5-flash",
+            modelName = "gemini-3.5-flash",
             apiKey = apiKey,
             generationConfig = generationConfig {
                 responseMimeType = "application/json"
