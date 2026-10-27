@@ -292,7 +292,7 @@ fun HomeScreen(
                                             Spacer(modifier = Modifier.width(12.dp))
                                             Column(modifier = Modifier.weight(1f)) {
                                                 Text(
-                                                    text = "Fridge-to-Table AI Assistant ✨",
+                                                    text = "Fridge-to-Table AI Assistant",
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.onSecondaryContainer
