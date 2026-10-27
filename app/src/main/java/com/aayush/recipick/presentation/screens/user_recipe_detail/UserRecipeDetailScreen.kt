@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.OutdoorGrill
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.RestaurantMenu
+import androidx.compose.material.icons.filled.Share
+import com.aayush.recipick.domain.repository.CommunityRepository
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
@@ -33,12 +35,17 @@ import kotlinx.coroutines.launch
 fun UserRecipeDetailScreen(
     recipeId: Int,
     onBack: () -> Unit,
-    repository: UserRecipeRepository
+    repository: UserRecipeRepository,
+    communityRepository: CommunityRepository? = null
 ) {
     val coroutineScope = rememberCoroutineScope()
     var recipe by remember { mutableStateOf<UserRecipe?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    var chefName by remember { mutableStateOf("") }
+    var isSharing by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(recipeId) {
         repository.getUserRecipeById(recipeId).collect { loadedRecipe ->
@@ -75,7 +82,70 @@ fun UserRecipeDetailScreen(
         )
     }
 
+    if (showShareDialog) {
+        AlertDialog(
+            onDismissRequest = { if (!isSharing) showShareDialog = false },
+            title = { Text("Share to Community Kitchen 👩‍🍳") },
+            text = {
+                Column {
+                    Text(
+                        text = "Share \"${recipe?.name}\" with the ReciPick community! Fellow home chefs can discover, rate, and post tips for your recipe.",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+                    OutlinedTextField(
+                        value = chefName,
+                        onValueChange = { chefName = it },
+                        label = { Text("Chef Name (Optional)") },
+                        placeholder = { Text("e.g. Chef Alex") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val currentRecipe = recipe ?: return@Button
+                        val repo = communityRepository ?: return@Button
+                        isSharing = true
+                        coroutineScope.launch {
+                            val result = repo.shareRecipeToCommunity(currentRecipe, chefName)
+                            isSharing = false
+                            showShareDialog = false
+                            result.fold(
+                                onSuccess = {
+                                    snackbarHostState.showSnackbar("Recipe shared to Community Kitchen! 🎉")
+                                },
+                                onFailure = { err ->
+                                    snackbarHostState.showSnackbar(err.localizedMessage ?: "Failed to share recipe")
+                                }
+                            )
+                        }
+                    },
+                    enabled = !isSharing
+                ) {
+                    if (isSharing) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text("Share Now")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showShareDialog = false },
+                    enabled = !isSharing
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -95,6 +165,15 @@ fun UserRecipeDetailScreen(
                 },
                 actions = {
                     if (recipe != null) {
+                        if (communityRepository != null) {
+                            IconButton(onClick = { showShareDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = "Share to Community",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,

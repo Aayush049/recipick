@@ -20,6 +20,8 @@ import com.aayush.recipick.data.remote.KtorClient
 import com.aayush.recipick.data.remote.RecipeAPIService
 import com.aayush.recipick.data.repository.RecipeRepositoryImplementation
 import com.aayush.recipick.presentation.screens.add_recipe.AddRecipeScreen
+import com.aayush.recipick.presentation.screens.ai.FridgeToTableScreen
+import com.aayush.recipick.presentation.screens.community.CommunityRecipeDetailScreen
 import com.aayush.recipick.presentation.screens.home.HomeScreen
 import com.aayush.recipick.presentation.screens.my_recipes.MyRecipesScreen
 import com.aayush.recipick.presentation.screens.planner.PlannerScreen
@@ -28,6 +30,9 @@ import com.aayush.recipick.presentation.screens.settings.SettingsScreen
 import com.aayush.recipick.presentation.screens.user_recipe_detail.UserRecipeDetailScreen
 import com.aayush.recipick.presentation.viewmodels.AddRecipeViewModel
 import com.aayush.recipick.presentation.viewmodels.AuthViewModel
+import com.aayush.recipick.presentation.viewmodels.CommunityDetailViewModel
+import com.aayush.recipick.presentation.viewmodels.CommunityViewModel
+import com.aayush.recipick.presentation.viewmodels.FridgeToTableViewModel
 import com.aayush.recipick.presentation.viewmodels.GroceryViewModel
 import com.aayush.recipick.presentation.viewmodels.MealPlanViewModel
 import com.aayush.recipick.presentation.viewmodels.MyRecipesViewModel
@@ -78,6 +83,9 @@ fun RecipeNavHost() {
                 .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable<HomeRoute> {
+                val communityViewModel: CommunityViewModel = viewModel(
+                    factory = CommunityViewModel.provideFactory(app.communityRepository)
+                )
                 HomeScreen(
                     onRecipeClick = { recipeId ->
                         navController.navigate(RecipeDetailsRoute(recipeId))
@@ -88,7 +96,17 @@ fun RecipeNavHost() {
                     onSettingsClick = {
                         navController.navigateToTopLevelDestination(SettingsRoute)
                     },
-                    isLoggedIn = currentUser != null
+                    onFridgeToTableClick = {
+                        navController.navigate(FridgeToTableRoute)
+                    },
+                    onCommunityRecipeClick = { recipeId ->
+                        navController.navigate(CommunityRecipeDetailRoute(recipeId))
+                    },
+                    onNavigateToMyRecipes = {
+                        navController.navigateToTopLevelDestination(MyRecipesRoute)
+                    },
+                    isLoggedIn = currentUser != null,
+                    communityViewModel = communityViewModel
                 )
             }
 
@@ -136,7 +154,8 @@ fun RecipeNavHost() {
                 UserRecipeDetailScreen(
                     recipeId = detailRoute.recipeId,
                     onBack = { navController.popBackStack() },
-                    repository = app.userRecipeRepository
+                    repository = app.userRecipeRepository,
+                    communityRepository = app.communityRepository
                 )
             }
 
@@ -168,9 +187,41 @@ fun RecipeNavHost() {
                 )
             }
 
+            composable<FridgeToTableRoute> {
+                val fridgeViewModel: FridgeToTableViewModel = viewModel(
+                    factory = FridgeToTableViewModel.provideFactory(
+                        geminiAiRepository = app.geminiAiRepository,
+                        aiPreferencesRepository = app.aiPreferencesRepository,
+                        userRecipeRepository = app.userRecipeRepository,
+                        mealPlanRepository = app.mealPlanRepository,
+                        syncRepository = app.syncRepository
+                    )
+                )
+                FridgeToTableScreen(
+                    viewModel = fridgeViewModel,
+                    onBack = { navController.popBackStack() },
+                    onOpenSettings = { navController.navigateToTopLevelDestination(SettingsRoute) }
+                )
+            }
+
+            composable<CommunityRecipeDetailRoute> { backStackEntry ->
+                val detailRoute = backStackEntry.toRoute<CommunityRecipeDetailRoute>()
+                val detailViewModel: CommunityDetailViewModel = viewModel(
+                    factory = CommunityDetailViewModel.provideFactory(
+                        recipeId = detailRoute.recipeId,
+                        repository = app.communityRepository
+                    )
+                )
+                CommunityRecipeDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = detailViewModel
+                )
+            }
+
             composable<SettingsRoute> {
                 SettingsScreen(
                     themeViewModel = themeViewModel,
+                    aiPreferencesRepository = app.aiPreferencesRepository,
                     authViewModel = authViewModel
                 )
             }

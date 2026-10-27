@@ -21,4 +21,10 @@ data class UserRecipeDetailRoute(val recipeId: Int)
 object PlannerRoute
 
 @Serializable
+object FridgeToTableRoute
+
+@Serializable
+data class CommunityRecipeDetailRoute(val recipeId: String)
+
+@Serializable
 object SettingsRoute

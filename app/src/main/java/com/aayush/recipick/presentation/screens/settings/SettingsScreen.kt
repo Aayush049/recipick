@@ -10,31 +10,49 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.aayush.recipick.BuildConfig
 import com.aayush.recipick.domain.model.ThemeMode
+import com.aayush.recipick.domain.repository.AiPreferencesRepository
 import com.aayush.recipick.presentation.screens.auth.AuthBottomSheet
 import com.aayush.recipick.presentation.viewmodels.AuthViewModel
 import com.aayush.recipick.presentation.viewmodels.ThemeViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     themeViewModel: ThemeViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    aiPreferencesRepository: AiPreferencesRepository? = null
 ) {
     val themeConfig by themeViewModel.themeConfig.collectAsState()
     val currentUser by authViewModel.currentUser.collectAsState()
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
+
+    val customApiKey by aiPreferencesRepository?.getCustomApiKey()?.collectAsState(initial = null)
+        ?: remember { mutableStateOf(null) }
+    var keyInput by remember(customApiKey) { mutableStateOf(customApiKey ?: "") }
+    var keySavedMessage by remember { mutableStateOf<String?>(null) }
+    var showKeyText by remember { mutableStateOf(false) }
 
     var showAuthBottomSheet by remember { mutableStateOf(false) }
     var showSignOutDialog by remember { mutableStateOf(false) }
@@ -49,8 +67,8 @@ fun SettingsScreen(
     if (showSignOutDialog) {
         AlertDialog(
             onDismissRequest = { showSignOutDialog = false },
-            title = { Text(text = "Sign Out", fontWeight = FontWeight.Bold) },
-            text = { Text("Are you sure you want to sign out? Your local recipes remain safe on this device.") },
+            title = { Text("Sign Out?") },
+            text = { Text("Are you sure you want to sign out from ReciPick?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -58,7 +76,7 @@ fun SettingsScreen(
                         authViewModel.signOut()
                     }
                 ) {
-                    Text("Sign Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    Text("Sign Out", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -75,7 +93,8 @@ fun SettingsScreen(
                 title = {
                     Text(
                         text = "Settings & Appearance",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -90,88 +109,78 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
-                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ── 1. User Profile Card ─────────────────────────────────────────
+            // ── 1. Chef Profile Card ─────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // User Avatar
                         if (currentUser?.photoUrl != null) {
-                            Surface(
-                                modifier = Modifier.size(58.dp),
-                                shape = CircleShape,
-                                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-                            ) {
-                                AsyncImage(
-                                    model = currentUser?.photoUrl,
-                                    contentDescription = "Profile Photo",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
+                            AsyncImage(
+                                model = currentUser?.photoUrl,
+                                contentDescription = "Profile Photo",
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
                         } else {
                             Surface(
-                                modifier = Modifier.size(58.dp),
+                                modifier = Modifier.size(56.dp),
                                 shape = CircleShape,
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
                                         imageVector = Icons.Default.Person,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(32.dp)
+                                        modifier = Modifier.size(28.dp)
                                     )
                                 }
                             }
                         }
 
-                        // User Details
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = currentUser?.displayName ?: (if (currentUser != null) "ReciPick Chef" else "Guest User"),
+                                    text = currentUser?.displayName ?: "Guest User",
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
+                                    fontSize = 17.sp,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 if (currentUser != null) {
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Surface(
-                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                                        shape = RoundedCornerShape(6.dp)
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                                     ) {
                                         Text(
                                             text = "Chef",
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                                            fontSize = 10.sp,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                         )
                                     }
                                 }
@@ -184,9 +193,6 @@ fun SettingsScreen(
                         }
                     }
 
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                    // Action Button (Sign In or Sign Out)
                     if (currentUser == null) {
                         Button(
                             onClick = { showAuthBottomSheet = true },
@@ -255,17 +261,13 @@ fun SettingsScreen(
                             ThemeMode.DARK -> "Always use relaxed dark theme"
                         }
 
-                        Card(
+                        Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { themeViewModel.setThemeMode(mode) },
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-                                else MaterialTheme.colorScheme.surface
-                            ),
-                            border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-                            else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            border = if (selected) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null
                         ) {
                             Row(
                                 modifier = Modifier
@@ -302,7 +304,145 @@ fun SettingsScreen(
                 }
             }
 
-            // ── 3. About ReciPick Section ────────────────────────────────────
+            // ── 3. Gemini AI Configuration Section ───────────────────────────
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Gemini AI Configuration",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        val hasDefaultKey = BuildConfig.GEMINI_API_KEY.isNotBlank()
+                        val hasCustomKey = !customApiKey.isNullOrBlank()
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "Status", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (hasCustomKey || hasDefaultKey) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.error.copy(alpha = 0.15f)
+                            ) {
+                                Text(
+                                    text = when {
+                                        hasCustomKey -> "Custom Key Active"
+                                        hasDefaultKey -> "Developer Key Active"
+                                        else -> "Key Not Set"
+                                    },
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (hasCustomKey || hasDefaultKey) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = "Powers 'Fridge-to-Table' AI recipe generation. You can provide your personal Google AI Studio key below.",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        OutlinedTextField(
+                            value = keyInput,
+                            onValueChange = { keyInput = it },
+                            label = { Text("Gemini API Key") },
+                            placeholder = { Text("AIzaSy...") },
+                            singleLine = true,
+                            visualTransformation = if (showKeyText) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = { showKeyText = !showKeyText }) {
+                                    Icon(
+                                        imageVector = if (showKeyText) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                        contentDescription = if (showKeyText) "Hide key" else "Show key"
+                                    )
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(
+                                onClick = { uriHandler.openUri("https://aistudio.google.com/apikey") },
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                Text("Get free key ↗", fontSize = 12.sp)
+                            }
+
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                if (hasCustomKey) {
+                                    OutlinedButton(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                aiPreferencesRepository?.setCustomApiKey(null)
+                                                keyInput = ""
+                                                keySavedMessage = "Custom key cleared."
+                                            }
+                                        },
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("Clear", fontSize = 12.sp)
+                                    }
+                                }
+
+                                Button(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            aiPreferencesRepository?.setCustomApiKey(keyInput.trim())
+                                            keySavedMessage = "API Key saved successfully!"
+                                        }
+                                    },
+                                    enabled = keyInput.trim() != (customApiKey ?: ""),
+                                    shape = RoundedCornerShape(8.dp),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                ) {
+                                    Text("Save Key", fontSize = 12.sp)
+                                }
+                            }
+                        }
+
+                        keySavedMessage?.let { msg ->
+                            Text(
+                                text = msg,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ── 4. About ReciPick Section ────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     text = "About ReciPick",
@@ -336,6 +476,14 @@ fun SettingsScreen(
                         ) {
                             Text(text = "Cloud Sync", color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(text = "Firebase Firestore", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(text = "AI Model", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(text = "Google Gemini 1.5 Flash", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         Row(

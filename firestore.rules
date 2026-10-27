@@ -1,8 +1,232 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}/{document=**}
+    // Document ID: {userId} or subcollection document IDs
+    // Fields:
+    //   - User personal recipes and sync data (private to each user)
+    //
+    // Collection: /community_recipes/{recipeId}
+    // Document ID: recipeId (string matching document id)
+    // Fields:
+    //   - id: string (required, immutable) - Unique ID matching recipeId
+    //   - authorId: string (required, immutable) - UID of author matching request.auth.uid
+    //   - authorName: string (required) - Display name of author (1..100 chars)
+    //   - name: string (required) - Title of recipe (1..150 chars)
+    //   - description: string (required) - Recipe summary (0..2000 chars)
+    //   - ingredients: list (required) - Ingredients list (1..200 items)
+    //   - instructions: list (required) - Instructions list (1..200 items)
+    //   - prepTimeMinutes: int (required) - Prep time in minutes (0..10080)
+    //   - cookTimeMinutes: int (required) - Cook time in minutes (0..10080)
+    //   - servings: int (required) - Serving count (1..500)
+    //   - difficulty: string (required) - Difficulty level (1..50 chars)
+    //   - cuisine: string (required) - Cuisine category (1..100 chars)
+    //   - caloriesPerServing: int (required) - Calories per serving (0..50000)
+    //   - imageUrl: string (optional, nullable) - Image URL (0..2048 chars)
+    //   - averageRating: number (required) - Average rating score (0.0..5.0)
+    //   - ratingCount: int (required) - Number of ratings (>= 0)
+    //   - tipCount: int (required) - Number of tips (>= 0)
+    //   - createdAt: int | timestamp (required, immutable) - Creation time millis or Timestamp
+    //
+    // Subcollection: /community_recipes/{recipeId}/ratings/{userId}
+    // Document ID: userId (string matching rating user's UID)
+    // Fields:
+    //   - userId: string (required, immutable) - UID matching request.auth.uid
+    //   - rating: int (required) - Rating value between 1 and 5
+    //   - timestamp: int | timestamp (required) - Submission time millis or Timestamp
+    //
+    // Subcollection: /community_recipes/{recipeId}/tips/{tipId}
+    // Document ID: tipId (string matching document id)
+    // Fields:
+    //   - id: string (required, immutable) - Unique ID matching tipId
+    //   - recipeId: string (required, immutable) - Parent recipe ID matching recipeId
+    //   - authorId: string (required, immutable) - UID matching request.auth.uid
+    //   - authorName: string (required) - Display name of author (1..100 chars)
+    //   - tipText: string (required) - Cooking tip text (1..1000 chars)
+    //   - createdAt: int | timestamp (required, immutable) - Creation time millis or Timestamp
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAuthor(authorId) {
+      return isAuthenticated() && request.auth.uid == authorId;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidCommunityRecipe(data) {
+      return data.keys().hasAll([
+          'id', 'authorId', 'authorName', 'name', 'description',
+          'ingredients', 'instructions', 'prepTimeMinutes', 'cookTimeMinutes',
+          'servings', 'difficulty', 'cuisine', 'caloriesPerServing',
+          'averageRating', 'ratingCount', 'tipCount', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'authorId', 'authorName', 'name', 'description',
+          'ingredients', 'instructions', 'prepTimeMinutes', 'cookTimeMinutes',
+          'servings', 'difficulty', 'cuisine', 'caloriesPerServing',
+          'imageUrl', 'averageRating', 'ratingCount', 'tipCount', 'createdAt'
+        ]) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+        data.authorId is string && data.authorId.size() > 0 && data.authorId.size() <= 128 &&
+        data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100 &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 150 &&
+        data.description is string && data.description.size() <= 2000 &&
+        data.ingredients is list && data.ingredients.size() >= 1 && data.ingredients.size() <= 200 &&
+        data.instructions is list && data.instructions.size() >= 1 && data.instructions.size() <= 200 &&
+        data.prepTimeMinutes is int && data.prepTimeMinutes >= 0 && data.prepTimeMinutes <= 10080 &&
+        data.cookTimeMinutes is int && data.cookTimeMinutes >= 0 && data.cookTimeMinutes <= 10080 &&
+        data.servings is int && data.servings >= 1 && data.servings <= 500 &&
+        data.difficulty is string && data.difficulty.size() > 0 && data.difficulty.size() <= 50 &&
+        data.cuisine is string && data.cuisine.size() > 0 && data.cuisine.size() <= 100 &&
+        data.caloriesPerServing is int && data.caloriesPerServing >= 0 && data.caloriesPerServing <= 50000 &&
+        (!('imageUrl' in data) || data.imageUrl == null || (data.imageUrl is string && data.imageUrl.size() <= 2048)) &&
+        data.averageRating is number && data.averageRating >= 0 && data.averageRating <= 5 &&
+        data.ratingCount is int && data.ratingCount >= 0 &&
+        data.tipCount is int && data.tipCount >= 0 &&
+        (data.createdAt is int || data.createdAt is timestamp);
+    }
+
+    function isValidRating(data) {
+      return data.keys().hasAll(['userId', 'rating', 'timestamp']) &&
+        data.keys().hasOnly(['userId', 'rating', 'timestamp']) &&
+        data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+        data.rating is int && data.rating >= 1 && data.rating <= 5 &&
+        (data.timestamp is int || data.timestamp is timestamp);
+    }
+
+    function isValidTip(data) {
+      return data.keys().hasAll(['id', 'recipeId', 'authorId', 'authorName', 'tipText', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'recipeId', 'authorId', 'authorName', 'tipText', 'createdAt']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+        data.recipeId is string && data.recipeId.size() > 0 && data.recipeId.size() <= 128 &&
+        data.authorId is string && data.authorId.size() > 0 && data.authorId.size() <= 128 &&
+        data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100 &&
+        data.tipText is string && data.tipText.size() > 0 && data.tipText.size() <= 1000 &&
+        (data.createdAt is int || data.createdAt is timestamp);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // User-private data and personal recipes
     match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
+    }
+
+    // Community Kitchen: Publicly browsable recipes shared by cooks
+    match /community_recipes/{recipeId} {
+      // Unauthenticated guests and signed-in users can browse and read recipes
+      allow read: if true;
+
+      // Authenticated users can share a new recipe
+      allow create: if isAuthenticated() &&
+        request.resource.data.authorId == request.auth.uid &&
+        request.resource.data.id == recipeId &&
+        (request.resource.data.averageRating == 0 || request.resource.data.averageRating == 0.0) &&
+        request.resource.data.ratingCount == 0 &&
+        request.resource.data.tipCount == 0 &&
+        isValidCommunityRecipe(request.resource.data);
+
+      // Updates can be:
+      // 1. Author editing recipe content (metrics are immutable during author edit)
+      // 2. Authenticated user submitting a rating (only averageRating and ratingCount updated)
+      // 3. Authenticated user posting a tip (only tipCount incremented by 1)
+      allow update: if isAuthenticated() && (
+        // 1. Author editing recipe content
+        (
+          isAuthor(resource.data.authorId) &&
+          request.resource.data.authorId == resource.data.authorId &&
+          request.resource.data.id == resource.data.id &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          request.resource.data.averageRating == resource.data.averageRating &&
+          request.resource.data.ratingCount == resource.data.ratingCount &&
+          request.resource.data.tipCount == resource.data.tipCount &&
+          isValidCommunityRecipe(request.resource.data)
+        ) ||
+        // 2. Rating submission metrics update
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['averageRating', 'ratingCount']) &&
+          request.resource.data.averageRating is number &&
+          request.resource.data.averageRating >= 0 &&
+          request.resource.data.averageRating <= 5 &&
+          request.resource.data.ratingCount is int &&
+          request.resource.data.ratingCount >= resource.data.ratingCount &&
+          request.resource.data.ratingCount <= resource.data.ratingCount + 1
+        ) ||
+        // 3. Tip posting metric increment
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tipCount']) &&
+          request.resource.data.tipCount is int &&
+          request.resource.data.tipCount == resource.data.tipCount + 1
+        )
+      );
+
+      // Only the author can delete their recipe
+      allow delete: if isAuthor(resource.data.authorId);
+
+      // Subcollection: Ratings for recipe
+      match /ratings/{userId} {
+        // Anyone can view community ratings
+        allow read: if true;
+
+        // Only the rated user can create/update their rating with values 1-5
+        allow create: if isAuthenticated() &&
+          request.auth.uid == userId &&
+          request.resource.data.userId == request.auth.uid &&
+          isValidRating(request.resource.data);
+
+        allow update: if isAuthenticated() &&
+          request.auth.uid == userId &&
+          request.resource.data.userId == resource.data.userId &&
+          isValidRating(request.resource.data);
+
+        allow delete: if isAuthenticated() &&
+          request.auth.uid == userId;
+      }
+
+      // Subcollection: Cooking tips & comments
+      match /tips/{tipId} {
+        // Anyone can read community tips
+        allow read: if true;
+
+        // Any authenticated user can submit a tip
+        allow create: if isAuthenticated() &&
+          request.resource.data.authorId == request.auth.uid &&
+          request.resource.data.recipeId == recipeId &&
+          request.resource.data.id == tipId &&
+          isValidTip(request.resource.data);
+
+        // Only the author of the tip can edit or delete their tip
+        allow update: if isAuthor(resource.data.authorId) &&
+          request.resource.data.authorId == resource.data.authorId &&
+          request.resource.data.recipeId == resource.data.recipeId &&
+          request.resource.data.id == resource.data.id &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          isValidTip(request.resource.data);
+
+        allow delete: if isAuthor(resource.data.authorId);
+      }
     }
   }
 }
