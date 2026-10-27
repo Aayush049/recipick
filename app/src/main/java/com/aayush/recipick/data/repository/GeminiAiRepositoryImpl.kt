@@ -4,8 +4,10 @@ import com.aayush.recipick.domain.model.GeneratedRecipe
 import com.aayush.recipick.domain.model.GeneratedRecipeList
 import com.aayush.recipick.domain.repository.AiPreferencesRepository
 import com.aayush.recipick.domain.repository.GeminiAiRepository
+import com.aayush.recipick.domain.util.GeminiErrorParser
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.generationConfig
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 
 class GeminiAiRepositoryImpl(
@@ -67,10 +69,27 @@ class GeminiAiRepositoryImpl(
             """.trimIndent())
         }
 
-        val response = generativeModel.generateContent(prompt)
-        val responseText = response.text ?: throw IllegalStateException("Empty response from Gemini AI")
+        val maxAttempts = 2
+        var lastException: Throwable? = null
 
-        val result = json.decodeFromString<GeneratedRecipeList>(responseText)
-        result.recipes
+        for (attempt in 1..maxAttempts) {
+            try {
+                val response = generativeModel.generateContent(prompt)
+                val responseText = response.text ?: throw IllegalStateException("Empty response from Gemini AI")
+                val result = json.decodeFromString<GeneratedRecipeList>(responseText)
+                return@runCatching result.recipes
+            } catch (e: Throwable) {
+                lastException = e
+                if (attempt < maxAttempts && GeminiErrorParser.isTransient(e)) {
+                    delay(1500)
+                } else {
+                    val friendly = GeminiErrorParser.parse(e)
+                    throw Exception(friendly, e)
+                }
+            }
+        }
+
+        val friendly = GeminiErrorParser.parse(lastException ?: IllegalStateException("Failed to generate recipes"))
+        throw Exception(friendly, lastException)
     }
 }

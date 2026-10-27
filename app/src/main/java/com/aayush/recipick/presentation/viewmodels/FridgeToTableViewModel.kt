@@ -12,6 +12,7 @@ import com.aayush.recipick.domain.repository.GeminiAiRepository
 import com.aayush.recipick.domain.repository.MealPlanRepository
 import com.aayush.recipick.domain.repository.SyncRepository
 import com.aayush.recipick.domain.repository.UserRecipeRepository
+import com.aayush.recipick.domain.util.GeminiErrorParser
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,10 +100,11 @@ class FridgeToTableViewModel(
                     )
                 }
             }.onFailure { err ->
+                val friendlyMessage = GeminiErrorParser.parse(err)
                 _uiState.update {
                     it.copy(
                         isGenerating = false,
-                        error = err.localizedMessage ?: "Failed to generate recipes with Gemini."
+                        error = friendlyMessage
                     )
                 }
             }
