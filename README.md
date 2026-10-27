@@ -51,7 +51,7 @@ Built adhering strictly to **Clean Architecture** (`Presentation` $\rightarrow$ 
 ### 2. 👨‍🍳 Community Kitchen & Social Hub
 - **Live Recipe Feed**: Real-time Firestore synchronization of publicly shared community recipes with hero imagery, cooking time, and author attribution.
 - **Interactive 5-Star Ratings**: Community peer rating system with atomic Firestore rating calculations and average score display.
-- **Cooking Tips Forum**: Dedicated real-time discussion thread per recipe for culinary substitutions, technique advice, and community comments.
+- **Cooking Tips Forum**: Dedicated real-time discussion thread per recipe for culinary tips, substitutions, and community discussions.
 - **Personal Recipe Publishing**: One-tap "Share to Community" action from personal recipe details.
 - **Clone to Cookbook**: Save any community recipe to your local offline Room database with one click.
 - **Hardened Cloud Security**: Production-ready `firestore.rules` protecting `/community_recipes`, `/ratings`, and `/tips`.
@@ -87,49 +87,24 @@ Built adhering strictly to **Clean Architecture** (`Presentation` $\rightarrow$ 
 
 ## 🧪 Testing & Quality Assurance
 
-ReciPick features comprehensive test coverage spanning all architectural layers. Testing is implemented using **JUnit 4**, **Kotlinx Coroutines Test** (`runTest`, `StandardTestDispatcher`), and mock repository patterns.
+ReciPick enforces strict testing standards across all architectural layers using **JUnit 4**, **Kotlinx Coroutines Test** (`runTest`, `StandardTestDispatcher`), and mock repository patterns.
 
-### Test Execution Summary
-```text
-BUILD SUCCESSFUL in 12s
-Actionable Tasks: 28 executed / up-to-date
-Total Tests Run: 67
-Passing Tests:   67 (100% Pass Rate)
-Failures:        0
-Errors:          0
-Skipped:         0
-```
+- **Total Automated Tests**: **67 Tests**
+- **Passed**: **67 (100% Pass Rate)**
+- **Failures / Errors / Skipped**: **0**
 
-### Breakdown by Testing Type & Test Suite
-
-| Test Category | Test Suite Class | Tests | Passed | Purpose / Verification Scope |
-|---|---|:---:|:---:|---|
-| **Presentation (ViewModel)** | `FridgeToTableViewModelTest` | **7** | ✅ 7 | Ingredient addition/deduplication, dietary filters, Gemini recipe generation, error recovery, saving to cookbook, meal plan scheduling. |
-| **Presentation (ViewModel)** | `AuthViewModelTest` | **7** | ✅ 7 | Email/Password login, user registration, Google Sign-In flow, password reset, session restore, logout. |
-| **Presentation (ViewModel)** | `AddRecipeViewModelTest` | **5** | ✅ 5 | Form input validation, dynamic ingredient & instruction builders, image URI attachment, recipe creation. |
-| **Presentation (ViewModel)** | `CommunityViewModelTest` | **5** | ✅ 5 | Live Firestore stream observation, search query filtering, recipe sharing, empty state handling. |
-| **Presentation (ViewModel)** | `CommunityDetailViewModelTest` | **4** | ✅ 4 | Recipe retrieval, 5-star rating submission, cooking tips forum postings, cookbook cloning. |
-| **Presentation (ViewModel)** | `PlannerViewModelsTest` | **4** | ✅ 4 | 7-day meal plan scheduling, slot management, grocery list generation, checklist item toggling. |
-| **Presentation (ViewModel)** | `RecipeDetailsViewModelTest` | **4** | ✅ 4 | Remote recipe fetching, ingredient checklist state, instruction steps, network error handling. |
-| **Presentation (ViewModel)** | `MyRecipesViewModelTest` | **3** | ✅ 3 | Local Room recipe observation, deletion confirmation dialogs, query filtering. |
-| **Presentation (ViewModel)** | `ThemeViewModelTest` | **3** | ✅ 3 | Appearance mode switching (System, Light, Dark) and DataStore persistence. |
-| **Domain & Business Logic** | `GeminiErrorParserTest` | **7** | ✅ 7 | High-traffic (503 Service Unavailable) translation, rate limit (429) mapping, network timeout handling, API key validation. |
-| **Domain & Business Logic** | `IngredientCategorizerTest` | **6** | ✅ 6 | Smart heuristic aisle categorization (Produce, Dairy, Meat, Pantry, Bakery, Other). |
-| **Data Layer & Repositories** | `UserRecipeRepositoryImplTest` | **5** | ✅ 5 | Offline-first Room CRUD, local entity mapping, reactive Flow observation. |
-| **Data Layer & Repositories** | `MealPlanAndGroceryRepositoryTest` | **3** | ✅ 3 | Meal plan item insertion/deletion, aggregated grocery list extraction, slot grouping. |
-| **Data Layer & Serialization** | `RecipeConvertersAndMapperTest` | **3** | ✅ 3 | Room TypeConverters for lists, JSON serialization/deserialization, DTO mapping. |
-| **Baseline Assertion** | `ExampleUnitTest` | **1** | ✅ 1 | JVM baseline unit test execution sanity. |
-| **Instrumentation / UI** | `ExampleInstrumentedTest` | **1** | ✅ 1 | AndroidJUnit4 runner configured for Compose UI and integration verification. |
-| **Total** | **16 Test Suites** | **67** | **67** | **100% Comprehensive Coverage** |
+### Testing Breakdown by Layer
+- **Presentation Layer (ViewModel Tests)**: **42 tests** across 9 ViewModels (`FridgeToTable`, `Auth`, `AddRecipe`, `Community`, `CommunityDetail`, `Planner`, `RecipeDetails`, `MyRecipes`, `Theme`), validating state flow transitions, coroutine dispatching, input validation, and UI event handling.
+- **Domain Layer (Business Logic & Utilities)**: **13 tests** covering AI error parsing & high-traffic resilience (`GeminiErrorParserTest` - 7 tests) and automated grocery aisle categorizer heuristics (`IngredientCategorizerTest` - 6 tests).
+- **Data Layer (Persistence & Serialization)**: **11 tests** covering offline-first Room database CRUD operations (`UserRecipeRepositoryImplTest` - 5 tests), meal plan item scheduling & grocery aggregation (`MealPlanAndGroceryRepositoryTest` - 3 tests), and JSON serialization TypeConverters (`RecipeConvertersAndMapperTest` - 3 tests).
+- **Baseline Sanity**: **1 test** (`ExampleUnitTest`).
+- **Instrumentation & UI Setup**: Configured with AndroidJUnitRunner (`androidx.test.runner.AndroidJUnitRunner`) for Compose UI integration.
 
 ### How to Run Tests
-Execute all unit tests from the project root:
 ```bash
-./gradlew testDebugUnitTest
-```
-To run Kotlin compilation checks:
-```bash
-./gradlew compileDebugKotlin
+./gradlew testDebugUnitTest      # Run all 67 unit tests
+./gradlew compileDebugKotlin     # Run static compilation checks
+./gradlew assembleDebug          # Full debug build
 ```
 
 ---
